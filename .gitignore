@@ -8,3 +8,12 @@ envs/DMCVGB/dm_control/*.egg-info/
 envs/habitatVGB/*.egg-info/
 envs/robosuiteVGB/*.egg-info/
 PKG-INFO
+third_party/CARLA_0.9.10
+places365_standard
+places365standard_easyformat.tar
+fixNvPe.py
+.vscode
+Vedant.sh
+bash.txt
+Changes.txt
+papers
