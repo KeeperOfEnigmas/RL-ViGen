@@ -17,5 +17,6 @@
 - [dmcontrol-generalization-benchmark](https://github.com/nicklashansen/dmcontrol-generalization-benchmark)
 
 ## ToDo
-- [ ] Change augmentation: shifting/random_conv to cropping/other augmentations
-- [ ] Context aware augmentation with VLM ([AComprehensive Survey of Data Augmentation in Visual Reinforcement Learning](https://arxiv.org/pdf/2210.04561v4): Section 3.5.1)
+- [ ] Change augmentation: shifting/random_conv to cropping/other augmentations.
+- [ ] Visualize the base result.
+- [ ] Context aware augmentation with VLM ([AComprehensive Survey of Data Augmentation in Visual Reinforcement Learning](https://arxiv.org/pdf/2210.04561v4): Section 3.5.1).
