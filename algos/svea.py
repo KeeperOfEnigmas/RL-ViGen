@@ -10,6 +10,7 @@ import torch.nn.functional as F
 
 import utils
 from utils import random_overlay
+import modifications
 
 class RandomShiftsAug(nn.Module):
     def __init__(self, pad):
@@ -295,8 +296,12 @@ class SVEAAgent:
         original_obs = obs.clone()
         next_obs = self.aug(next_obs.float())
 
+        # Original code
         # strong augmentation
-        aug_obs = self.encoder(random_overlay(original_obs))
+        # aug_obs = self.encoder(random_overlay(original_obs))
+        
+        # Modification
+        aug_obs = self.encoder(modifications.random_crop(original_obs))
 
         # encode
         obs = self.encoder(obs)

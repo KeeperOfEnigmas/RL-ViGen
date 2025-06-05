@@ -25,6 +25,7 @@ from logger import Logger
 from replay_buffer import ReplayBufferStorage, make_replay_loader
 from video import TrainVideoRecorder, VideoRecorder
 import wandb
+import modifications
 
 torch.backends.cudnn.benchmark = True
 
@@ -135,9 +136,14 @@ class Workspace:
                 self.video_recorder.init(self.eval_env, enabled=(episode == 0))
             while not time_step.last():
                 with torch.no_grad(), utils.eval_mode(self.agent):
-                    action = self.agent.act(time_step.observation,
+                    # Original code
+                    # action = self.agent.act(time_step.observation,
+                    #                         self.global_step,
+                    #                         eval_mode=True)
+                    action = self.agent.act(modifications.random_color_slight(obs),
                                             self.global_step,
                                             eval_mode=True)
+                    
                 time_step = self.eval_env.step(action)
                 if self.env_name == 'dmc':
                     self.video_recorder.record_dmc(self.eval_env, video=True)
@@ -197,6 +203,17 @@ class Workspace:
 
         episode_step, episode_reward = 0, 0
         time_step = self.train_env.reset()
+
+        # Modification
+        # Test saliency map
+        # obs = torch.as_tensor(time_step.observation, device=self.device)
+        # modifications.saliency_map(self.agent, obs.float())
+
+        # Modification
+        # View input
+        # obs = time_step.observation
+        # modifications.view_input(obs)
+
         self.replay_storage.add(time_step)
         self.train_video_recorder.init(time_step.observation)
         metrics = None

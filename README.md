@@ -18,5 +18,5 @@
 
 ## ToDo
 - [ ] Change augmentation: shifting/random_conv to cropping/other augmentations.
-- [ ] Visualize the base result.
+- [ ] Visualize the base result. (Performance, saliency map...)
 - [ ] Context aware augmentation with VLM ([AComprehensive Survey of Data Augmentation in Visual Reinforcement Learning](https://arxiv.org/pdf/2210.04561v4): Section 3.5.1).

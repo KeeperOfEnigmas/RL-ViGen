@@ -3,8 +3,15 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import random
+import numpy as np
 
 class RandomCropAug(nn.Module):
+    """
+    Locate a random crop in the input tensor x, than scale it back to the original size.
+    
+    Arguments:
+        x (torch.Tensor): Input tensor of shape (n, c, h, w).
+    """
     def __init__(self):
         super().__init__()
 
@@ -12,35 +19,38 @@ class RandomCropAug(nn.Module):
         # x: (n, c, h, w)
         n, c, h, w = x.size()
         assert h == w, "Input tensor must be square (height == width)"
-        random_minus = random.randint(h//10//4, h//10)
+        random_minus = random.randint(h//40, h//10)
         th, tw = (h - random_minus, w - random_minus)
         if h == th and w == tw:
             return x
         i = torch.randint(0, h - th + 1, (1,)).item()
         j = torch.randint(0, w - tw + 1, (1,)).item()
-
+        crop = x[:, :, i:i+th, j:j+tw]
+        resized = F.interpolate(crop, size=(h, w), mode='bilinear', align_corners=False)
+        
         print("Class random crop!")
-        return x[:, :, i:i+th, j:j+tw]
+        return resized
     
 def random_crop(x):
     """
-    Locate a random crop in the input tensor x.
+    Locate a random crop in the input tensor x, than scale it back to the original size.
     
     Arguments:
         x (torch.Tensor): Input tensor of shape (n, c, h, w).
-        output_size (tuple): Desired output size (height, width).
     """
     n, c, h, w = x.size()
     assert h==w, "Input tensor must be square (height == width)"
-    random_minus = random.randint(h//10//4, h//10)
+    random_minus = random.randint(h//40, h//10)
     th, tw = (h - random_minus, w - random_minus)
     if h == th and w == tw:
         return x
     i = torch.randint(0, h - th + 1, (1,)).item()
     j = torch.randint(0, w - tw + 1, (1,)).item()
+    crop = x[:, :, i:i+th, j:j+tw]
+    resized = F.interpolate(crop, size=(h, w), mode='bilinear', align_corners=False)
 
-    print("Simple function random crop!")
-    return x[:, :, i:i+th, j:j+tw]
+    # print("Simple function random crop!")
+    return resized
 
 
 def random_window(x):
@@ -136,6 +146,114 @@ class RandomShiftsAug(nn.Module):
                              align_corners=False)
 
 
+def view_input(obs):
+    if isinstance(obs, np.ndarray):
+        for i in range(0, obs.shape[0], 3):
+            img = obs[i:i+3].transpose(1, 2, 0)
+            plt.imshow(img.astype('uint8'))
+            plt.title(f"Frame stack {i//3}")
+            plt.show()
+
+
+def random_color_slight(img, scale_range=(0.8, 1.2), bias_range=(-30, 30)):
+    """
+    Slightly adjust the color intensity of each channel in the input image.
+    """
+    assert img.ndim == 3 and img.shape[0] % 3 == 0, "Input must be (3*n, H, W)"
+    c, h, w = img.shape
+    out = np.empty_like(img)
+    for i in range(0, c, 3):
+        frame = img[i:i+3].astype(np.float32)  # (3, H, W)
+        # Random scale and bias for each channel
+        scale = np.random.uniform(*scale_range, size=(3, 1, 1))
+        bias = np.random.uniform(*bias_range, size=(3, 1, 1))
+        frame = frame * scale + bias
+        frame = np.clip(frame, 0, 255)
+        out[i:i+3] = frame.astype(img.dtype)
+    return out
+
+def random_color_intense(img, scale_range=(0.5, 1.5), bias_range=(-50, 50)):
+    """
+    Drastically change the color intensity of each channel in the input image.
+    """
+    assert img.ndim == 3 and img.shape[0] % 3 == 0, "Input must be (3*n, H, W)"
+    c, h, w = img.shape
+    out = np.empty_like(img)
+    for i in range(0, c, 3):
+        frame = img[i:i+3].astype(np.float32)  # (3, H, W)
+        # Random scale and bias for each channel
+        scale = np.random.uniform(*scale_range, size=(3, 1, 1))
+        bias = np.random.uniform(*bias_range, size=(3, 1, 1))
+        frame = frame * scale + bias
+        frame = np.clip(frame, 0, 255)
+        out[i:i+3] = frame.astype(img.dtype)
+    return out
+
+
+def saliency_map(self, obs: torch.tensor, save_dir=None, base_filename="svea_saliency_map.png"):
+    """
+    Visualize the saliency map for the input image.
+    obs: torch.Tensor, shape (B, C, H, W) or (C, H, W)
+    idx: int or None, index of the batch to visualize (if batch size > 1)
+    """
+    import matplotlib.pyplot as plt
+
+    # Ensure obs is batched
+    if obs.ndim == 3:
+        obs = obs.unsqueeze(0)  # (1, C, H, W)
+    obs = obs.clone().requires_grad_(True)
+
+    # Forward pass
+    output = self.encoder(obs)
+    score, class_idx = output.max(dim=1)
+    # score = score.sum()  # sum over batch if needed
+
+    # Backward pass
+    score.backward()
+
+    # Get saliency: max over channels, abs value
+    # saliency = obs.grad.abs()
+    # sal = saliency[0][:3].max(dim=0)[0].cpu().numpy()
+    # img = obs[0][:3].cpu().detach().numpy().transpose(1, 2, 0) / 255.0
+    saliency = obs.grad.data.abs().squeeze()[:3,:,:].max(dim=0)[0]
+    saliency = saliency.cpu().data.numpy()
+    img = obs.cpu().data.numpy().squeeze().transpose(1, 2, 0)[:,:,:3]/255.0
+
+    # Plot
+    fig = plt.figure(figsize=(8, 4))
+    plt.subplot(1, 2, 1)
+    plt.title("Saliency Map")
+    plt.imshow(saliency, cmap='gray')
+    plt.axis('off')
+    plt.subplot(1, 2, 2)
+    plt.title("Input Image")
+    plt.imshow(img)
+    plt.axis('off')
+    plt.tight_layout()
+
+    if save_dir is not None:
+        save_unique_image(fig, save_dir, base_filename)
+    else:
+        plt.show()
+    plt.close(fig)
+
+def save_unique_image(fig, directory, base_filename):
+    """
+    Save a matplotlib figure to directory with a unique incremented filename.
+    """
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    name, ext = os.path.splitext(base_filename)
+    filename = base_filename
+    i = 1
+
+    while os.path.exists(os.path.join(directory, filename)):
+        filename = f"{name}_{i}{ext}"
+        i += 1
+    fig.savefig(os.path.join(directory, filename))
+    plt.close(fig)
+
+
 
 
 # Testing section
@@ -212,7 +330,26 @@ def img_to_tensor(path, size):
     return img_tensor
 
 
+def test_color_change(path):
+    img = stack_images(path, size=(84, 84))  # shape (9, H, W)
+    # changed = random_color_slight(np.array(img))
+    changed = random_color_intense(np.array(img))
+    view_input(changed)
+
+
+def stack_images(paths, size=(84, 84)):
+    imgs = []
+    for path in paths:
+        img = Image.open(path).convert('RGB').resize(size)
+        img_np = np.array(img)  # shape (H, W, 3)
+        img_np = img_np.transpose(2, 0, 1)  # to (3, H, W)
+        imgs.append(img_np)
+    stacked = np.concatenate(imgs, axis=0)  # shape (9, H, W)
+    return stacked
+
+
 
 
 if __name__ == "__main__":
-    test_augmentation("random_shift", simple_function=False)
+    # test_augmentation("random_crop", simple_function=True)
+    test_color_change(['test/test_image.jpg', 'test/test_image.jpg', 'test/test_image.jpg'])
