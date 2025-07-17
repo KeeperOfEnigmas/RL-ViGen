@@ -16,6 +16,13 @@
 
 ## ToDo
 - [ ] Different augmentations.
+  - [x] Cropping
+  - [x] Window
+  - [x] Rotation
+  - [x] Flipping horizontally/vertically
+  - Convolution
+  - Cutout
+  - CutMix
 - [ ] Add mix augmentations. 
 - [ ] Experiment with different tests. (Pendulum, acrobot)
 - [ ] Different algorithms. (PIE-G, DrQ-v2)
