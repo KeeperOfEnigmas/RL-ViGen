@@ -27,6 +27,8 @@ from video import TrainVideoRecorder, VideoRecorder
 import wandb
 import modifications
 
+import random
+
 torch.backends.cudnn.benchmark = True
 
 
@@ -128,6 +130,9 @@ class Workspace:
         step, episode, total_reward = 0, 0, 0
         eval_until_episode = utils.Until(self.cfg.num_eval_episodes)
 
+        # Modification
+        saliency_map_drawn = 0
+
         while eval_until_episode(episode):
             time_step = self.eval_env.reset()
             if self.env_name == 'dmc':
@@ -135,11 +140,20 @@ class Workspace:
             else:
                 self.video_recorder.init(self.eval_env, enabled=(episode == 0))
             while not time_step.last():
+
+                # Modification
+                obs = time_step.observation
+                if not saliency_map_drawn%2500:
+                    self.agent.draw_saliency_map(obs, self.global_step)
+                saliency_map_drawn += 1
+
                 with torch.no_grad(), utils.eval_mode(self.agent):
                     # Original code
                     # action = self.agent.act(time_step.observation,
                     #                         self.global_step,
                     #                         eval_mode=True)
+
+                    # Modification
                     action = self.agent.act(modifications.random_color_slight(obs),
                                             self.global_step,
                                             eval_mode=True)
@@ -212,7 +226,7 @@ class Workspace:
         # Modification
         # View input
         # obs = time_step.observation
-        # modifications.view_input(obs)
+        # modifications.view_input(obs, save=True)
 
         self.replay_storage.add(time_step)
         self.train_video_recorder.init(time_step.observation)

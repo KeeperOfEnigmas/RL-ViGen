@@ -1,7 +1,5 @@
 # Bachelor Thesis
 
-
-
 ## Papers
 
 - [SVEA](https://arxiv.org/pdf/2107.00644)
@@ -20,3 +18,9 @@
 - [ ] Change augmentation: shifting/random_conv to cropping/other augmentations.
 - [ ] Visualize the base result. (Performance, saliency map...)
 - [ ] Context aware augmentation with VLM ([AComprehensive Survey of Data Augmentation in Visual Reinforcement Learning](https://arxiv.org/pdf/2210.04561v4): Section 3.5.1).
+
+## Things to note
+- Mention different kinds of background changes. (Color...)
+- Show baseline result without any augmentation for comparison.
+- Mention frame stacks of images.
+- Citation should be directly on the page.

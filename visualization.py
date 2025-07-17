@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
+from scipy.optimize import curve_fit
 
 X_AXIS = "episode"
 Y_AXIS = "episode_reward"
@@ -29,7 +30,7 @@ def visualize(algo: str, ax, method="base", title="Sample"):
     # ax[0].plot(training_data[X_AXIS], training_data[Y_AXIS], linestyle='None', marker='.', label='Training ' + method)
     train_ma = training_data[Y_AXIS].rolling(window=100, min_periods=1).mean()
     ax[0].plot(training_data[X_AXIS], train_ma, label='Training ' + method)
-    ax[0].set_title("Training, " + title)
+    ax[0].set_title("Training, \n" + title)
     ax[0].set_xlabel(X_AXIS)
     ax[0].set_ylabel(Y_AXIS)
     ax[0].grid()
@@ -38,7 +39,7 @@ def visualize(algo: str, ax, method="base", title="Sample"):
     # ax[1].plot(evaluation_data[X_AXIS], evaluation_data[Y_AXIS], linestyle='None', marker='.', label='Evaluation ' + method)
     eval_ma = evaluation_data[Y_AXIS].rolling(window=20, min_periods=1).mean()
     ax[1].plot(evaluation_data[X_AXIS], eval_ma, label='Evaluation ' + method)
-    ax[1].set_title("Evaluation, " + title)
+    ax[1].set_title("Evaluation, \n" + title)
     ax[1].set_xlabel(X_AXIS)
     ax[1].set_ylabel(Y_AXIS)
     ax[1].grid()
@@ -54,13 +55,13 @@ def compare(algo: str, ax, method: str=None):
         # ax[0].plot(training_data[X_AXIS], training_data[Y_AXIS], linestyle='None', marker='.', label='Training ' + method)
         train_ma = training_data[Y_AXIS].rolling(window=100, min_periods=1).mean()
         ax[0].plot(training_data[X_AXIS], train_ma, label='Training ' + method)
-        ax[0].set_title(ax[0].get_title() + f"/{method}")
+        ax[0].set_title(ax[0].get_title() + f", {method}")
         ax[0].legend()
 
         # ax[1].plot(evaluation_data[X_AXIS], evaluation_data[Y_AXIS], linestyle='None', marker='.', label='Evaluation ' + method)
         eval_ma = evaluation_data[Y_AXIS].rolling(window=20, min_periods=1).mean()
         ax[1].plot(evaluation_data[X_AXIS], eval_ma, label='Evaluation ' + method)
-        ax[1].set_title(ax[1].get_title() + f"/{method}")
+        ax[1].set_title(ax[1].get_title() + f", {method}")
         ax[1].legend()
     else:
         raise ValueError(f"Method can't be None!")
@@ -68,11 +69,14 @@ def compare(algo: str, ax, method: str=None):
 
 
 if __name__ == "__main__":
-    fig, ax = plt.subplots(1, 2, figsize=(8, 4), sharey=True)
+    fig, axs = plt.subplots(1, 2, figsize=(8, 4), sharey=True)
 
     #  visualize("svea", ax, method="random_crop_slight_color", title="SVEA, walker_walk, random_crop_slight_color")
-    visualize("svea", ax, method="base_slight_color", title="SVEA, walker_walk, base_slight_color")
-    compare("svea", ax, method="random_crop_slight_color")
-    # compare("svea", ax, method="random_crop_slight_color_2025.5.31")
-    # compare("svea", ax, method="random_crop_slight_color_2025.6.1")
+    visualize("svea", axs, method="base_slight_color", title="SVEA, walker_walk, base")
+    compare("svea", axs, method="base_no_augmentation")
+    compare("svea", axs, method="random_crop_slight_color")
+    compare("svea", axs, method="random_rot_slight_color")
+    compare("svea", axs, method="random_window_slight_color")
+    compare("svea", axs, method="random_flip_h_slight_color")
+    compare("svea", axs, method="random_flip_v_slight_color")
     plt.show()

@@ -215,6 +215,10 @@ class SVEAAgent:
             if step < self.num_expl_steps:
                 action.uniform_(-1.0, 1.0)
         return action.cpu().numpy()[0]
+    
+    def draw_saliency_map(self, obs, step):
+        obs = torch.as_tensor(obs, device=self.device)
+        modifications.saliency_map(self, obs.float(), step, save_dir="D:/Git/RL-ViGen/result/svea/saliency_map")
 
     def update_critic(self, obs, action, reward, discount, next_obs, step, aug_obs):
         metrics = dict()
@@ -236,7 +240,12 @@ class SVEAAgent:
         Q1, Q2 = self.critic(obs, action)
         critic_loss = F.mse_loss(Q1, target_Q) + F.mse_loss(Q2, target_Q)
 
+        # Original code
         aug_Q1, aug_Q2 = self.critic(aug_obs, action)
+
+        # Modification (no augmentation)
+        # aug_Q1, aug_Q2 = self.critic(obs, action)
+
         aug_loss = F.mse_loss(aug_Q1, target_Q) + F.mse_loss(aug_Q2, target_Q)
 
         critic_loss = 0.5 * (critic_loss + aug_loss)
@@ -291,6 +300,9 @@ class SVEAAgent:
         obs, action, reward, discount, next_obs = utils.to_torch(
             batch, self.device)
 
+        # Modification
+        # modifications.view_input(obs)
+
         # augment
         obs = self.aug(obs.float())
         original_obs = obs.clone()
@@ -301,7 +313,11 @@ class SVEAAgent:
         # aug_obs = self.encoder(random_overlay(original_obs))
         
         # Modification
-        aug_obs = self.encoder(modifications.random_crop(original_obs))
+        # aug_obs = self.encoder(modifications.random_crop(original_obs))
+        # aug_obs = self.encoder(modifications.random_rot(original_obs))
+        aug_obs = self.encoder(modifications.random_flip_v(original_obs))
+        # aug_obs = self.encoder(modifications.random_window(original_obs))
+        # aug_obs = original_obs
 
         # encode
         obs = self.encoder(obs)
