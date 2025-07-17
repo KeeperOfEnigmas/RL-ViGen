@@ -15,8 +15,12 @@
 - [dmcontrol-generalization-benchmark](https://github.com/nicklashansen/dmcontrol-generalization-benchmark)
 
 ## ToDo
-- [ ] Change augmentation: shifting/random_conv to cropping/other augmentations.
-- [ ] Visualize the base result. (Performance, saliency map...)
+- [ ] Different augmentations.
+- [ ] Add mix augmentations. 
+- [ ] Experiment with different tests. (Pendulum, acrobot)
+- [ ] Different algorithms. (PIE-G, DrQ-v2)
+- [ ] Different evaluation environment. (Color easy/hard, video easy/hard)
+- [ ] Multiple runs with different seeds. 
 - [ ] Context aware augmentation with VLM ([AComprehensive Survey of Data Augmentation in Visual Reinforcement Learning](https://arxiv.org/pdf/2210.04561v4): Section 3.5.1).
 
 ## Things to note
