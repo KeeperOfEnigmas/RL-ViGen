@@ -136,6 +136,42 @@ def random_conv(x):
     return total_out.reshape(n, c, h, w)
 
 
+def random_cutout(x, cutout_size=12, fill=0, mix=False, dataset='places365_standard'):
+    """
+    Randomly masks a square region of size cutout_size x cutout_size in each image in the batch.
+    Args:
+        x (torch.Tensor): Input tensor of shape (n, c, h, w).
+        cutout (int): Size of the square to cut out (default: 12).
+        fill (float): Value to fill the cutout region (default: 0).
+        mix (bool): If True, overlay the cutout with a random image from the dataset (default: False).
+    Returns:
+        torch.Tensor: Tensor with cutout applied.
+    """
+    n, c, h, w = x.size()
+    for i in range(n):
+        top = random.randint(0, h - cutout_size)
+        left = random.randint(0, w - cutout_size)
+        if not mix:
+            x[i, :, top:top+cutout_size, left:left+cutout_size] = fill
+        elif mix:
+            if dataset == 'places365_standard':
+                if utils.places_dataloader is None:
+                    utils._load_places(batch_size=x.size(0), image_size=x.size(-1))
+                imgs = utils._get_places_batch(batch_size=1).repeat(1, x.size(1)//3, 1, 1)
+                
+                # copy = imgs.detach().cpu().numpy()
+                # copy = copy[0].transpose(1, 2, 0)
+                # plt.imshow(copy)
+                # plt.show()
+
+                imgs = imgs*255
+            else:
+                raise NotImplementedError(f'overlay has not been implemented for dataset "{dataset}"')
+            x[i, :, top:top+cutout_size, left:left+cutout_size] = imgs[i, :, top:top+cutout_size, left:left+cutout_size]
+
+    return x
+
+
 class RandomShiftsAug(nn.Module):
     def __init__(self, pad):
         super().__init__()
@@ -339,6 +375,10 @@ def test_augmentation(augmentation, path, simple_function=False):
             augmented_img = random_flip_h(img_tensor)
         elif augmentation=="random_flip_v":
             augmented_img = random_flip_v(img_tensor)
+        elif augmentation=="random_cutout":
+            augmented_img = random_cutout(img_tensor)
+        elif augmentation=="random_cutmix":
+            augmented_img = random_cutout(img_tensor, mix=True)
         else:
             raise NotImplementedError(f"Simple function {augmentation} not implemented.")
     else:
@@ -446,11 +486,13 @@ def load_obs():
 
 
 if __name__ == "__main__":
-    test_augmentation("random_rot", 'result/svea/miscellaneous/images/input.png', simple_function=True)
-    test_augmentation("random_window", 'result/svea/miscellaneous/images/input.png', simple_function=True)
-    test_augmentation("random_crop", 'result/svea/miscellaneous/images/input.png', simple_function=True)
-    test_augmentation("random_flip_h", 'result/svea/miscellaneous/images/input.png', simple_function=True)
-    test_augmentation("random_flip_v", 'result/svea/miscellaneous/images/input.png', simple_function=True)
+    # test_augmentation("random_rot", 'result/svea/miscellaneous/images/input.png', simple_function=True)
+    # test_augmentation("random_window", 'result/svea/miscellaneous/images/input.png', simple_function=True)
+    # test_augmentation("random_crop", 'result/svea/miscellaneous/images/input.png', simple_function=True)
+    # test_augmentation("random_flip_h", 'result/svea/miscellaneous/images/input.png', simple_function=True)
+    # test_augmentation("random_flip_v", 'result/svea/miscellaneous/images/input.png', simple_function=True)
+    # test_augmentation("random_cutout", 'result/svea/miscellaneous/images/input.png', simple_function=True)
+    test_augmentation("random_cutmix", 'result/svea/miscellaneous/images/input.png', simple_function=True)
     # test_color_change(['result/svea/images/original observation.png', 'result/svea/images/original observation.png', 'result/svea/images/original observation.png'])
     # agent = load_model()
     # view_input(load_obs())
