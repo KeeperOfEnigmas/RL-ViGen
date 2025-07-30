@@ -35,6 +35,10 @@ use_wandb: false
 name: drq
 wandb_group: None
 model_dir: none
+# Modification
+# eval_mode
+eval_type: color
+eval_difficulty: easy
 
 agent:
   _target_: algos.drq.DrQAgent

@@ -1,6 +1,7 @@
 easy_task_list=('walker_walk' 'pendulum_swingup')
 seed_list=(1 3 5)
-algorithm=("svea" "pieg" "drqv2")
+# algorithm=("svea" "pieg" "drqv2")
+augmentation=("default" "cropping" "window" "rotation" "flip_v" "flip_h" "convolution" "cutout" "cutmix" "no_aug") 
 frames=1001000
 feature_dim=50
 sgqn_quantile=0.93
@@ -10,7 +11,7 @@ env=dmc
 
 for task_name in ${easy_task_list[@]}; do
     for seed in ${seed_list[@]}; do
-        # for algo in "${algorithm[@]}"; do
+        for aug in ${augmentation[@]}; do
             CUDA_VISIBLE_DEVICES=0  python train.py \
                                         env=${env} \
                                         task_name=${task_name} \
@@ -22,9 +23,12 @@ for task_name in ${easy_task_list[@]}; do
                                         save_snapshot=True \
                                         save_video=False \
                                         feature_dim=${feature_dim} \
+                                        +aug=${aug} \
+                                        # +eval_type=color \
+                                        # +eval_difficulty=easy \
         #                             agent.sgqn_quantile=${sgqn_quantile} \
         #                             agent.aux_lr=${aux_lr}
-            # done
+            done
         done
     done
 

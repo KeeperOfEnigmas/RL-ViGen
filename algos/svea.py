@@ -290,7 +290,7 @@ class SVEAAgent:
 
         return metrics
 
-    def update(self, replay_iter, step):
+    def update(self, replay_iter, step, augmentation="default"):
         metrics = dict()
 
         if step % self.update_every_steps != 0:
@@ -310,10 +310,30 @@ class SVEAAgent:
 
         # Original code
         # strong augmentation
-        # aug_obs = self.encoder(random_overlay(original_obs))
+        if augmentation == "default":
+            aug_obs = self.encoder(random_overlay(original_obs))
         
-        # Modification
-        aug_obs = self.encoder(modifications.random_crop(original_obs))
+        # Modification 
+        elif augmentation == "cropping":
+            aug_obs = self.encoder(modifications.random_crop(original_obs))
+        elif augmentation == "window":
+            aug_obs = self.encoder(modifications.random_window(original_obs))
+        elif augmentation == "rotation":
+            aug_obs = self.encoder(modifications.random_rot(original_obs))
+        elif augmentation == "flip_v":
+            aug_obs = self.encoder(modifications.random_flip_v(original_obs))
+        elif augmentation == "flip_h":
+            aug_obs = self.encoder(modifications.random_flip_h(original_obs))
+        elif augmentation == "convolution":
+            aug_obs = self.encoder(modifications.random_conv(original_obs))
+        elif augmentation == "cutout":
+            aug_obs = self.encoder(modifications.random_cutout(original_obs))
+        elif augmentation == "cutmix":
+            aug_obs = self.encoder(modifications.random_cutout(original_obs, mix=True))
+        elif augmentation == "no_aug":
+            aug_obs = original_obs
+        else:
+            raise ValueError(f"Unknown augmentation type: {augmentation}")
         # aug_obs = self.encoder(modifications.random_rot(original_obs))
         # aug_obs = self.encoder(modifications.random_flip_v(original_obs))
         # aug_obs = self.encoder(modifications.random_cutout(original_obs, mix=True))
