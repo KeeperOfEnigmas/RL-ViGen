@@ -132,11 +132,11 @@ def random_conv(x):
         out = torch.sigmoid(F.conv2d(temp_x, weights))*255.
         total_out = out if i == 0 else torch.cat([total_out, out], axis=0)
 
-    print("simple function random conv!")
+    # print("simple function random conv!")
     return total_out.reshape(n, c, h, w)
 
 
-def random_cutout(x, cutout_size=12, fill=0, mix=False, dataset='places365_standard'):
+def random_cutout(x, cutout_size=12, fill=False, mix=False, dataset='places365_standard'):
     """
     Randomly masks a square region of size cutout_size x cutout_size in each image in the batch.
     Args:
@@ -148,27 +148,28 @@ def random_cutout(x, cutout_size=12, fill=0, mix=False, dataset='places365_stand
         torch.Tensor: Tensor with cutout applied.
     """
     n, c, h, w = x.size()
+    if mix and dataset == 'places365_standard':
+        if utils.places_dataloader is None:
+            utils._load_places(batch_size=n, image_size=w)
+        imgs = utils._get_places_batch(batch_size=n)
+        imgs = imgs * 255
+        imgs = imgs.to(x.device).type_as(x)
+        if c > 3:
+            imgs = imgs.repeat(1, c // 3, 1, 1)
     for i in range(n):
         top = random.randint(0, h - cutout_size)
         left = random.randint(0, w - cutout_size)
         if not mix:
-            x[i, :, top:top+cutout_size, left:left+cutout_size] = fill
-        elif mix:
-            if dataset == 'places365_standard':
-                if utils.places_dataloader is None:
-                    utils._load_places(batch_size=x.size(0), image_size=x.size(-1))
-                imgs = utils._get_places_batch(batch_size=1).repeat(1, x.size(1)//3, 1, 1)
-                
-                # copy = imgs.detach().cpu().numpy()
-                # copy = copy[0].transpose(1, 2, 0)
-                # plt.imshow(copy)
-                # plt.show()
-
-                imgs = imgs*255
+            if not fill:
+                x[i, :, top:top+cutout_size, left:left+cutout_size] = 0
             else:
-                raise NotImplementedError(f'overlay has not been implemented for dataset "{dataset}"')
-            x[i, :, top:top+cutout_size, left:left+cutout_size] = imgs[i, :, top:top+cutout_size, left:left+cutout_size]
-
+                fill = random.randint(0, 255)
+                x[i, :, top:top+cutout_size, left:left+cutout_size] = fill
+        elif mix and dataset == 'places365_standard':
+                x[i, :, top:top+cutout_size, left:left+cutout_size] = imgs[i, :, top:top+cutout_size, left:left+cutout_size]
+        elif mix:
+            raise NotImplementedError(f'overlay has not been implemented for dataset "{dataset}"')
+    # view_input(x)
     return x
 
 

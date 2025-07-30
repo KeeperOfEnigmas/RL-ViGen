@@ -35,6 +35,10 @@ feature_dim: 50
 name: svea
 wandb_group: None
 model_dir: none
+# Modification
+# eval_mode
+eval_background_type: color
+eval_background_difficulty: easy
 
 agent:
   _target_: algos.svea.SVEAAgent

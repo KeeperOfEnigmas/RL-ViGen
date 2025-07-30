@@ -79,4 +79,7 @@ if __name__ == "__main__":
     compare("svea", axs, method="random_window_slight_color")
     compare("svea", axs, method="random_flip_h_slight_color")
     compare("svea", axs, method="random_flip_v_slight_color")
+    compare("svea", axs, method="random_cutout_slight_color")
+    compare("svea", axs, method="random_conv_slight_color")
+    compare("svea", axs, method="random_cutmix_slight_color")
     plt.show()

@@ -11,6 +11,7 @@ from torchvision.models import resnet18, resnet34
 from torchvision import transforms
 import utils
 from utils import random_overlay
+import modifications
 
 
 
@@ -312,8 +313,18 @@ class PIEGAgent:
         # encode
         obs = self.encoder(obs)
 
+        # Original code
         # strong augmentation
-        aug_obs = self.encoder(random_overlay(original_obs))
+        # aug_obs = self.encoder(random_overlay(original_obs))
+        
+        # Modification
+        aug_obs = self.encoder(modifications.random_crop(original_obs))
+        # aug_obs = self.encoder(modifications.random_rot(original_obs))
+        # aug_obs = self.encoder(modifications.random_flip_v(original_obs))
+        # aug_obs = self.encoder(modifications.random_cutout(original_obs, mix=True))
+        # aug_obs = self.encoder(modifications.random_conv(original_obs))
+        # aug_obs = self.encoder(modifications.random_window(original_obs))
+        # aug_obs = original_obs
 
         with torch.no_grad():
             next_obs = self.encoder(next_obs)

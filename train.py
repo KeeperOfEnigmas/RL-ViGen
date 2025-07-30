@@ -72,7 +72,9 @@ class Workspace:
             self.train_env = dmc.make(self.cfg.task_name, self.cfg.frame_stack,
                                     self.cfg.action_repeat, self.cfg.seed)
             self.eval_env = dmc.make(self.cfg.task_name, self.cfg.frame_stack,
-                                    self.cfg.action_repeat, self.cfg.seed)
+                                    self.cfg.action_repeat, self.cfg.seed,
+                                    # Modification
+                                    type=self.cfg.eval_background_type, difficulty=self.cfg.eval_background_difficulty)
         elif env == 'robosuite':
             from wrappers.robo_wrapper import robo_make
             self.train_env = robo_make(name=self.cfg.task_name, action_repeat=self.cfg.action_repeat, 
@@ -145,6 +147,7 @@ class Workspace:
                 obs = time_step.observation
                 if not saliency_map_drawn%2500:
                     self.agent.draw_saliency_map(obs, self.global_step)
+                    # modifications.view_input(obs, save=True)
                 saliency_map_drawn += 1
 
                 with torch.no_grad(), utils.eval_mode(self.agent):

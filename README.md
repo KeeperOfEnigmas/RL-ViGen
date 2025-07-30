@@ -20,9 +20,9 @@
   - [x] Window
   - [x] Rotation
   - [x] Flipping horizontally/vertically
-  - Convolution
-  - Cutout
-  - CutMix
+  - [x] Convolution
+  - [x] Cutout
+  - [x] CutMix
 - [ ] Add mix augmentations. 
 - [ ] Experiment with different tests. (Pendulum, acrobot)
 - [ ] Different algorithms. (PIE-G, DrQ-v2)

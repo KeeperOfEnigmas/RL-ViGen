@@ -313,9 +313,11 @@ class SVEAAgent:
         # aug_obs = self.encoder(random_overlay(original_obs))
         
         # Modification
-        # aug_obs = self.encoder(modifications.random_crop(original_obs))
+        aug_obs = self.encoder(modifications.random_crop(original_obs))
         # aug_obs = self.encoder(modifications.random_rot(original_obs))
-        aug_obs = self.encoder(modifications.random_flip_v(original_obs))
+        # aug_obs = self.encoder(modifications.random_flip_v(original_obs))
+        # aug_obs = self.encoder(modifications.random_cutout(original_obs, mix=True))
+        # aug_obs = self.encoder(modifications.random_conv(original_obs))
         # aug_obs = self.encoder(modifications.random_window(original_obs))
         # aug_obs = original_obs
 
