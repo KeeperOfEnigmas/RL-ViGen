@@ -135,6 +135,27 @@ def random_conv(x):
     # print("simple function random conv!")
     return total_out.reshape(n, c, h, w)
 
+# def random_conv(x):
+#     """
+#     Applies a random 3x3 convolution to each 3-channel group in the input tensor.
+#     Args:
+#         x (torch.Tensor): Input tensor of shape (n, c, h, w), c must be divisible by 3.
+#     Returns:
+#         torch.Tensor: Tensor with random convolution applied, same shape as input.
+#     """
+#     n, c, h, w = x.size()
+#     assert c % 3 == 0, "Channel count must be divisible by 3 (for RGB groups)"
+#     out = torch.empty_like(x)
+#     num_groups = c // 3
+#     for i in range(n):
+#         for g in range(num_groups):
+#             weights = torch.randn(3, 3, 3, 3, device=x.device)
+#             img = x[i, g*3:(g+1)*3].unsqueeze(0) / 255.0  # (1, 3, h, w)
+#             img = F.pad(img, pad=[1]*4, mode='replicate')
+#             conv = torch.sigmoid(F.conv2d(img, weights)) * 255.0
+#             out[i, g*3:(g+1)*3] = conv.squeeze(0)
+#     return out
+
 
 def random_cutout(x, cutout_size=12, fill=False, mix=False, dataset='places365_standard'):
     """
@@ -548,7 +569,8 @@ if __name__ == "__main__":
     # test_augmentation("random_flip_h", 'result/svea/miscellaneous/images/input.png', simple_function=True)
     # test_augmentation("random_flip_v", 'result/svea/miscellaneous/images/input.png', simple_function=True)
     # test_augmentation("random_cutout", 'result/svea/miscellaneous/images/input.png', simple_function=True)
-    test_augmentation("random_cutmix", 'result/svea/miscellaneous/images/input.png', simple_function=True)
+    # test_augmentation("random_cutmix", 'result/svea/miscellaneous/images/input.png', simple_function=True)
+    test_augmentation("random_conv", 'result/svea/miscellaneous/images/input.png', simple_function=True)
     # test_color_change(['result/svea/images/original observation.png', 'result/svea/images/original observation.png', 'result/svea/images/original observation.png'])
     # agent = load_model()
     # view_input(load_obs())
