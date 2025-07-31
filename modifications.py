@@ -207,6 +207,61 @@ class RandomShiftsAug(nn.Module):
                              align_corners=False)
 
 
+def random_mix(x):
+    aug_list = ["overlay", "cropping", "window", "rotation", "flip_v", "flip_h", "convolution", "cutout", "cutmix", "no_aug"]
+    aug = random.choice(aug_list)
+
+    return augment(x, aug)
+
+
+def augment(x, aug="default"):
+    if aug == "overlay":
+        x = utils.random_overlay(x)
+        # view_input(x, save=True)
+        return x
+    elif aug == "cropping":
+        x = random_crop(x)
+        # view_input(x, save=True)
+        return x
+    elif aug == "window":
+        x = random_window(x)
+        # view_input(x, save=True)
+        return x
+    elif aug == "rotation":
+        x = random_rot(x)
+        # view_input(x, save=True)
+        return x
+    elif aug == "flip_v":
+        x = random_flip_v(x)
+        # view_input(x, save=True)
+        return x
+    elif aug == "flip_h":
+        x = random_flip_h(x)
+        # view_input(x, save=True)
+        return x
+    elif aug == "convolution":
+        x = random_conv(x)
+        # view_input(x, save=True)
+        return x
+    elif aug == "cutout":
+        x = random_cutout(x)
+        # view_input(x, save=True)
+        return x
+    elif aug == "cutmix":
+        x = random_cutout(x, mix=True)
+        # view_input(x, save=True)
+        return x
+    elif aug == "mix":
+        return random_mix(x)
+    elif aug == "no_aug":
+        # view_input(x, save=True)
+        return x
+    elif aug == "default":
+        raise ValueError("Augmentation should not be default.")
+    else:
+        raise ValueError(f"Unknown augmentation type: {aug}")
+
+
 def view_input(obs, save=False, sample_idx=128):
     if isinstance(obs, torch.Tensor):
         obs = obs.detach().cpu().numpy()

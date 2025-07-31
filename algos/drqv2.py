@@ -9,6 +9,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 import utils
+import modifications
 
 
 class RandomShiftsAug(nn.Module):
@@ -227,7 +228,7 @@ class DrQV2Agent:
 
         return metrics
 
-    def update(self, replay_iter, step):
+    def update(self, replay_iter, step, augmentation="default"):
         metrics = dict()
 
         if step % self.update_every_steps != 0:
@@ -238,7 +239,14 @@ class DrQV2Agent:
             batch, self.device)
 
         # augment
-        obs = self.aug(obs.float())
+        # Original code
+        if augmentation == "default":
+            obs = self.aug(obs.float())
+
+        # Modification
+        else:
+            obs = modifications.augment(obs.float(), aug=augmentation)
+
         next_obs = self.aug(next_obs.float())
         # encode
         obs = self.encoder(obs)

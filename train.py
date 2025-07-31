@@ -280,6 +280,7 @@ class Workspace:
 
             # try to update the agent
             if not seed_until_step(self.global_step):
+                # Modification
                 metrics = self.agent.update(self.replay_iter, self.global_step, augmentation=self.cfg.aug)
                 self.logger.log_metrics(metrics, self.global_frame, ty='train')
 

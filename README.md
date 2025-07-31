@@ -23,7 +23,7 @@
   - [x] Convolution
   - [x] Cutout
   - [x] CutMix
-- [ ] Add mix augmentations. 
+  - [x] Add mix augmentations. 
 - [ ] Experiment with different tests. (Pendulum, acrobot)
 - [ ] Different algorithms. (PIE-G, DrQ-v2)
 - [ ] Different evaluation environment. (Color easy/hard, video easy/hard)

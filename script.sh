@@ -1,7 +1,6 @@
-easy_task_list=('walker_walk' 'pendulum_swingup')
-seed_list=(1 3 5)
-# algorithm=("svea" "pieg" "drqv2")
-augmentation=("default" "cropping" "window" "rotation" "flip_v" "flip_h" "convolution" "cutout" "cutmix" "no_aug") 
+easy_task_list=('walker_walk' 'pendulum_swingup' 'cheetah_run' 'humanoid_walk')
+seed_list=(1 2 3 4 5)
+augmentation=("default" "cropping" "window" "rotation" "flip_v" "flip_h" "convolution" "cutout" "cutmix" "mix" "no_aug") 
 frames=1001000
 feature_dim=50
 sgqn_quantile=0.93
@@ -26,10 +25,11 @@ for task_name in ${easy_task_list[@]}; do
                                         +aug=${aug} \
                                         # +eval_type=color \
                                         # +eval_difficulty=easy \
+                                        # +agent._target_=agents.svea.SVEAAgent \
         #                             agent.sgqn_quantile=${sgqn_quantile} \
         #                             agent.aux_lr=${aux_lr}
             done
         done
     done
 
-# python train.py env=dmc task_name='walker_walk' seed=5 action_repeat=2 use_wandb=False use_tb=False num_train_frames=1001000 save_snapshot=True save_video=False feature_dim=50
+# python train.py env=dmc task_name='walker_walk' seed=5 action_repeat=2 use_wandb=False use_tb=False num_train_frames=1001000 save_snapshot=True save_video=False feature_dim=50 +aug=mix
