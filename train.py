@@ -72,9 +72,9 @@ class Workspace:
             self.train_env = dmc.make(self.cfg.task_name, self.cfg.frame_stack,
                                     self.cfg.action_repeat, self.cfg.seed)
             self.eval_env = dmc.make(self.cfg.task_name, self.cfg.frame_stack,
-                                    self.cfg.action_repeat, self.cfg.seed,
+                                    self.cfg.action_repeat, self.cfg.seed)
                                     # Modification
-                                    type=self.cfg.eval_type, difficulty=self.cfg.eval_difficulty)
+                                    # type=self.cfg.eval_type, difficulty=self.cfg.eval_difficulty) 
         elif env == 'robosuite':
             from wrappers.robo_wrapper import robo_make
             self.train_env = robo_make(name=self.cfg.task_name, action_repeat=self.cfg.action_repeat, 

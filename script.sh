@@ -1,8 +1,8 @@
-easy_task_list=('pendulum_swingup' 'walker_walk')
+easy_task_list=('pendulum_swingup' 'cheetah_run' 'humanoid_walk')
 seed_list=(1 2 3 4 5)
 algorithm=("svea" "pieg")
-eval_type=("video" "color")
-eval_difficulty=("hard" "easy")
+# eval_type=("video" "color")
+# eval_difficulty=("hard" "easy")
 #augmentation=("default" "cropping" "window" "rotation" "flip_v" "flip_h" "convolution" "cutout" "cutmix" "no_aug") 
 augmentation=("cutmix" "cutout" "no_aug" "default" "cropping" "window" "rotation" "flip_v" "flip_h" "convolution" "mix") 
 frames=1001000
@@ -16,8 +16,8 @@ for task_name in ${easy_task_list[@]}; do
     for seed in ${seed_list[@]}; do
         for aug in ${augmentation[@]}; do
             for algo in ${algorithm[@]}; do
-                for type in ${eval_type[@]}; do
-                    for difficulty in ${eval_difficulty[@]}; do
+                # for type in ${eval_type[@]}; do
+                    # for difficulty in ${eval_difficulty[@]}; do
                         CUDA_VISIBLE_DEVICES=0  python train.py \
                                                     env=${env} \
                                                     task_name=${task_name} \
@@ -30,13 +30,13 @@ for task_name in ${easy_task_list[@]}; do
                                                     save_video=False \
                                                     feature_dim=${feature_dim} \
                                                     agent._target_=algos.${algo}.${algo^^}Agent \
-                                                    eval_type=${type} \
-                                                    eval_difficulty=${difficulty} \
                                                     +aug=${aug} \
+                                                    # eval_type=${type} \
+                                                    # eval_difficulty=${difficulty} \
                     #                             agent.sgqn_quantile=${sgqn_quantile} \
                     #                             agent.aux_lr=${aux_lr}
-                        done
-                    done
+                        # done
+                    # done
                 done
             done
         done
