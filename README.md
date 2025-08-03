@@ -24,8 +24,9 @@
   - [x] Cutout
   - [x] CutMix
   - [x] Add mix augmentations. 
-- [ ] SVEA_walker walk_color easy_random convolution
-- [ ] SVEA_walker walk_color easy_random mix
+- [ ] SVEA_walker walk_random convolution
+- [ ] SVEA_walker walk_random mix
+- [ ] SVEA_walker walk_no aug
 - [ ] Experiment with different tests. (Pendulum, acrobot)
 - [ ] Different algorithms. (PIE-G, DrQ-v2)
 - [ ] Different evaluation environment. (Color easy/hard, video easy/hard)

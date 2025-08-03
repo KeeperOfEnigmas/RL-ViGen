@@ -48,7 +48,9 @@ class Workspace:
         work_dir = f'{cfg.model_dir}/{self.agent_name}/{cfg.seed}'
         self.model_work_dir = work_dir
         #agent = torch.load('%s/snapshot.pt' % (work_dir), map_location='cuda:0')
-        agent = torch.load('/home/weiyi/RL-ViGen/exp_local/2025.07.31/svea/140009_+aug=cutmix,action_repeat=2,env=dmc,feature_dim=50,num_train_frames=1001000,save_snapshot=True,save_video=False,seed=1,task_name=walker_walk,use_tb=False,use_wandb=False/snapshot.pt', map_location='cuda:0')
+        wotkspace_dir = "D:/Git/RL-ViGen/exp_local/"
+        model_name = "/snapshot.pt"
+        agent = torch.load(f'{wotkspace_dir}2025.08.01/svea/091257_+aug=flip_h,action_repeat=2,env=dmc,feature_dim=50,num_train_frames=1001000,save_snapshot=True,save_video=False,seed=1,task_name=walker_walk,use_tb=False,use_wandb=False{model_name}')
         self.agent = agent['agent']
         self._global_step = agent['_global_step']
 
