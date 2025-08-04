@@ -156,6 +156,18 @@ def random_conv(x):
 #             out[i, g*3:(g+1)*3] = conv.squeeze(0)
 #     return out
 
+def random_conv_frames(x):
+    """
+    Apply random_conv to each 3-channel frame in a stacked input of shape (9, 84, 84).
+    Returns tensor of same shape.
+    """
+    frames = []
+    for i in range(0, x.shape[0], 3):
+        frame = x[i:i+3].unsqueeze(0)  # (1, 3, 84, 84)
+        out = random_conv(frame)       # (1, 3, 84, 84)
+        frames.append(out.squeeze(0))  # (3, 84, 84)
+    return torch.cat(frames, dim=0)    # (9, 84, 84)
+
 
 def random_cutout(x, cutout_size=12, fill=False, mix=False, dataset='places365_standard'):
     """
@@ -235,7 +247,7 @@ def random_mix(x):
     return augment(x, aug)
 
 
-def augment(x, aug="default"):
+def augment(x, aug="default", eval=False):
     if aug == "overlay":
         x = utils.random_overlay(x)
         # view_input(x, save=True)
@@ -260,9 +272,12 @@ def augment(x, aug="default"):
         x = random_flip_h(x)
         # view_input(x, save=True)
         return x
-    elif aug == "convolution":
+    elif aug == "convolution" and eval == False:
         x = random_conv(x)
         # view_input(x, save=True)
+        return x
+    elif aug == "convolution" and eval == True:
+        x = random_conv_frames(x)
         return x
     elif aug == "cutout":
         x = random_cutout(x)
