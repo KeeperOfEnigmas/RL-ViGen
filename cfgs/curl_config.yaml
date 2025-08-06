@@ -35,6 +35,9 @@ use_wandb: false
 name: curl
 wandb_group: None
 model_dir: None
+# evaluation
+# eval_type: original
+# eval_difficulty: easy
 
 agent:
   _target_: algos.curl.CURLAgent

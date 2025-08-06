@@ -31,7 +31,7 @@
 - [x] Different algorithms. (PIE-G)
 - [x] Different evaluation environment. (Color easy/hard, video easy/hard)
 - [ ] Different evaluation augmentation. 
-- [ ] Multiple runs with different seeds. 
+- [x] Multiple runs with different seeds. 
 - [ ] Context aware augmentation with VLM ([AComprehensive Survey of Data Augmentation in Visual Reinforcement Learning](https://arxiv.org/pdf/2210.04561v4): Section 3.5.1).
 
 ## Things to note

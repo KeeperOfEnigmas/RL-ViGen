@@ -49,8 +49,9 @@ class Workspace:
         self.agent_name = cfg.wandb_group.split('_')[1]
         work_dir = f'{cfg.model_dir}/{self.agent_name}/{cfg.seed}'
         self.model_work_dir = work_dir
+        # Modification
         agent = torch.load(f'{cfg.model_dir}', map_location='cuda:0')
-        # agent = torch.load('/home/weiyi/RL-ViGen/exp_local/2025.07.31/svea/140009_+aug=cutmix,action_repeat=2,env=dmc,feature_dim=50,num_train_frames=1001000,save_snapshot=True,save_video=False,seed=1,task_name=walker_walk,use_tb=False,use_wandb=False/snapshot.pt', map_location='cuda:0')
+        # agent = torch.load('D:/Git/RL-ViGen/exp_local/svea/pendulum_swingup/1/cutmix/snapshot.pt', map_location='cuda:0')
         self.agent = agent['agent']
         self._global_step = agent['_global_step']
 
@@ -68,7 +69,8 @@ class Workspace:
         self.train_env = dmc.make(self.cfg.task_name, self.cfg.frame_stack,
                                   self.cfg.action_repeat, self.cfg.seed, type='video', difficulty='hard')
         self.eval_env = dmc.make(self.cfg.task_name, self.cfg.frame_stack,
-                                 self.cfg.action_repeat, self.cfg.seed, type='video', difficulty='hard')
+                                 # Modification
+                                 self.cfg.action_repeat, self.cfg.seed, type=self.cfg.eval_type, difficulty=self.cfg.eval_difficulty)
         # create replay buffer
         data_specs = (self.train_env.observation_spec(),
                       self.train_env.action_spec(),
@@ -124,9 +126,15 @@ class Workspace:
                                                 eval_mode=True)
                 else:
                     with torch.no_grad(), utils.eval_mode(self.agent):
-                        action = self.agent.act(modifications.augment(torch.as_tensor(time_step.observation, device=self.device), self.cfg.eval_aug, eval=True),
-                                                self.global_step,
-                                                eval_mode=True)
+                        # Modification
+                        if self.cfg.eval_type=="original" and self.cfg.eval_aug!="no_aug":
+                            action = self.agent.act(modifications.augment(torch.as_tensor(time_step.observation, device=self.device), self.cfg.eval_aug, eval=True),
+                                                    self.global_step,
+                                                    eval_mode=True)
+                        else:
+                            action = self.agent.act(time_step.observation,
+                                                    self.global_step,
+                                                    eval_mode=True)
                 time_step = self.eval_env.step(action)
                 self.video_recorder.record_dmc(self.eval_env, video=True)
                 total_reward += time_step.reward

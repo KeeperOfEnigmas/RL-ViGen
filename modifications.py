@@ -206,6 +206,43 @@ def random_cutout(x, cutout_size=12, fill=False, mix=False, dataset='places365_s
     return x
 
 
+def random_distortion(x, strength=0.1, grid_size=4):
+    """
+    Apply a random elastic distortion to the input tensor.
+    Args:
+        x (torch.Tensor): Input tensor of shape (n, c, h, w).
+        strength (float): Distortion strength.
+        grid_size (int): Size of the coarse grid for distortion.
+    Returns:
+        torch.Tensor: Distorted tensor, same shape as input.
+    """
+    n, c, h, w = x.size()
+    device = x.device
+
+    # Create a coarse random displacement grid
+    dx = torch.randn(n, 1, grid_size, grid_size, device=device) * strength
+    dy = torch.randn(n, 1, grid_size, grid_size, device=device) * strength
+
+    # Upsample to image size
+    dx = F.interpolate(dx, size=(h, w), mode='bilinear', align_corners=True)
+    dy = F.interpolate(dy, size=(h, w), mode='bilinear', align_corners=True)
+
+    # Create mesh grid
+    xx = torch.linspace(-1, 1, w, device=device)
+    yy = torch.linspace(-1, 1, h, device=device)
+    grid_y, grid_x = torch.meshgrid(yy, xx, indexing='ij')
+    grid = torch.stack((grid_x, grid_y), 2)  # (h, w, 2)
+    grid = grid.unsqueeze(0).repeat(n, 1, 1, 1)  # (n, h, w, 2)
+
+    # Add displacement
+    grid[..., 0] = grid[..., 0] + dx.squeeze(1).permute(0, 2, 1)
+    grid[..., 1] = grid[..., 1] + dy.squeeze(1).permute(0, 2, 1)
+
+    # grid_sample expects (n, h, w, 2)
+    x_distorted = F.grid_sample(x, grid, padding_mode='border', align_corners=True)
+    return x_distorted
+
+
 class RandomShiftsAug(nn.Module):
     def __init__(self, pad):
         super().__init__()
@@ -240,6 +277,15 @@ class RandomShiftsAug(nn.Module):
                              align_corners=False)
 
 
+def random_frames(x, augmentation:str):
+    frames = []
+    for i in range(0, x.shape[0], 3):
+        frame = x[i:i+3].unsqueeze(0)  # (1, 3, 84, 84)
+        out = augment(frame, aug=augmentation)       # (1, 3, 84, 84)
+        frames.append(out.squeeze(0))  # (3, 84, 84)
+    return torch.cat(frames, dim=0)    # (9, 84, 84)
+
+
 def random_mix(x):
     aug_list = ["overlay", "cropping", "window", "rotation", "flip_v", "flip_h", "convolution", "cutout", "cutmix", "no_aug"]
     aug = random.choice(aug_list)
@@ -248,29 +294,47 @@ def random_mix(x):
 
 
 def augment(x, aug="default", eval=False):
-    if aug == "overlay":
+    if aug == "overlay" and eval == False:
         x = utils.random_overlay(x)
         # view_input(x, save=True)
         return x
-    elif aug == "cropping":
+    elif aug == "overlay" and eval == True:
+        x = random_frames(x, augmentation="overlay")
+        return x
+    elif aug == "cropping" and eval == False:
         x = random_crop(x)
         # view_input(x, save=True)
         return x
-    elif aug == "window":
+    elif aug == "cropping" and eval == True:
+        x = random_frames(x.float(), augmentation="cropping")
+        return x
+    elif aug == "window" and eval == False:
         x = random_window(x)
         # view_input(x, save=True)
         return x
-    elif aug == "rotation":
+    elif aug == "window" and eval == True:
+        x = random_frames(x.float(), augmentation="window")
+        return x
+    elif aug == "rotation" and eval == False:
         x = random_rot(x)
         # view_input(x, save=True)
         return x
-    elif aug == "flip_v":
+    elif aug == "rotation" and eval == True:
+        x = random_frames(x, augmentation="rotation")
+        return x
+    elif aug == "flip_v" and eval == False:
         x = random_flip_v(x)
         # view_input(x, save=True)
         return x
-    elif aug == "flip_h":
+    elif aug == "flip_v" and eval == True:
+        x = random_frames(x, augmentation="flip_v")
+        return x
+    elif aug == "flip_h" and eval == False:
         x = random_flip_h(x)
         # view_input(x, save=True)
+        return x
+    elif aug == "flip_h" and eval == True:
+        x = random_frames(x, augmentation="flip_h")
         return x
     elif aug == "convolution" and eval == False:
         x = random_conv(x)
@@ -279,13 +343,26 @@ def augment(x, aug="default", eval=False):
     elif aug == "convolution" and eval == True:
         x = random_conv_frames(x)
         return x
-    elif aug == "cutout":
+    elif aug == "cutout" and eval == False:
         x = random_cutout(x)
         # view_input(x, save=True)
         return x
-    elif aug == "cutmix":
+    elif aug == "cutout" and eval == True:
+        x = random_frames(x, augmentation="cutout")
+        return x
+    elif aug == "cutmix" and eval == False:
         x = random_cutout(x, mix=True)
         # view_input(x, save=True)
+        return x
+    elif aug == "cutmix" and eval == True:
+        x = random_frames(x, augmentation="cutmix")
+        return x
+    elif aug == "distortion" and eval == False:
+        x = random_distortion(x)
+        # view_input(x, save=True)
+        return x
+    elif aug == "distortion" and eval == True:
+        x = random_frames(x.float(), augmentation="distortion")
         return x
     elif aug == "mix":
         return random_mix(x)
@@ -471,6 +548,8 @@ def test_augmentation(augmentation, path, simple_function=False):
             augmented_img = random_cutout(img_tensor)
         elif augmentation=="random_cutmix":
             augmented_img = random_cutout(img_tensor, mix=True)
+        elif augmentation=="random_distortion":
+            augmented_img = random_distortion(img_tensor)
         else:
             raise NotImplementedError(f"Simple function {augmentation} not implemented.")
     else:
@@ -585,7 +664,8 @@ if __name__ == "__main__":
     # test_augmentation("random_flip_v", 'result/svea/miscellaneous/images/input.png', simple_function=True)
     # test_augmentation("random_cutout", 'result/svea/miscellaneous/images/input.png', simple_function=True)
     # test_augmentation("random_cutmix", 'result/svea/miscellaneous/images/input.png', simple_function=True)
-    test_augmentation("random_conv", 'result/svea/miscellaneous/images/input.png', simple_function=True)
+    # test_augmentation("random_conv", 'result/svea/miscellaneous/images/input.png', simple_function=True)
+    test_augmentation("random_distortion", 'test/test_image.jpg', simple_function=True)
     # test_color_change(['result/svea/images/original observation.png', 'result/svea/images/original observation.png', 'result/svea/images/original observation.png'])
     # agent = load_model()
     # view_input(load_obs())
