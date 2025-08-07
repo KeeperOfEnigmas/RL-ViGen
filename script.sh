@@ -12,10 +12,10 @@ action_repeat=2
 aux_lr=8e-5
 env=dmc
 
-for task_name in ${easy_task_list[@]}; do
-    for seed in ${seed_list[@]}; do
-        for aug in ${augmentation[@]}; do
-            for algo in ${algorithm[@]}; do
+for algo in ${algorithm[@]}; do
+    for task_name in ${easy_task_list[@]}; do
+        for seed in ${seed_list[@]}; do
+            for aug in ${augmentation[@]}; do
                 # for type in ${eval_type[@]}; do
                     # for difficulty in ${eval_difficulty[@]}; do
                         CUDA_VISIBLE_DEVICES=0  python train.py \
