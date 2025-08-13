@@ -296,7 +296,7 @@ class PIEGAgent:
 
         return metrics
 
-    def update(self, replay_iter, step, augmentation="default"):
+    def update(self, replay_iter, step, augmentation="overlay"):
         metrics = dict()
 
         if step % self.update_every_steps != 0:
@@ -315,7 +315,7 @@ class PIEGAgent:
 
         # Original code
         # strong augmentation
-        if augmentation == "default":
+        if augmentation == "overlay":
             aug_obs = self.encoder(random_overlay(original_obs))
         
         # Modification 
