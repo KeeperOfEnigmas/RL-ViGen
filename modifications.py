@@ -357,6 +357,10 @@ def augment(x, aug="overlay", eval=False):
     elif aug == "cutmix" and eval == True:
         x = random_frames(x, augmentation="cutmix")
         return x
+    elif aug == "distortion" and eval == False:
+        x = random_distortion(x)
+        # view_input(x, save=True)
+        return x
     elif aug == "distortion" and eval == True:
         x = random_frames(x.float(), augmentation="distortion")
         return x

@@ -264,13 +264,13 @@ class Workspace:
                 episode_reward = 0
 
             # try to evaluate
-            if eval_every_step(self.global_step):
-                self.logger.log('eval_total_time', self.timer.total_time(),
-                                self.global_frame)
-                if self.cfg.env == 'habitat':
-                    self.habi_eval()
-                else:
-                    self.eval()
+            # if eval_every_step(self.global_step):
+            #     self.logger.log('eval_total_time', self.timer.total_time(),
+            #                     self.global_frame)
+            #     if self.cfg.env == 'habitat':
+            #         self.habi_eval()
+            #     else:
+            #         self.eval()
 
             # sample action
             with torch.no_grad(), utils.eval_mode(self.agent):
