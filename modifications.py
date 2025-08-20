@@ -243,6 +243,35 @@ def random_distortion(x, strength=0.1, grid_size=4):
     return x_distorted
 
 
+def vignette(x, strength=1):
+    """
+    Apply a vignette (darken corners) effect to a batch of images.
+    Args:
+        x (torch.Tensor): Input tensor of shape (n, c, h, w), values in [0, 255].
+        strength (float): How strong the vignette is (0=no effect, 1=full black corners).
+    Returns:
+        torch.Tensor: Tensor with vignette applied, same shape as input.
+    """
+    n, c, h, w = x.size()
+    device = x.device
+
+    # Create mesh grid normalized to [-1, 1]
+    yy, xx = torch.meshgrid(
+        torch.linspace(-1, 1, h, device=device),
+        torch.linspace(-1, 1, w, device=device),
+        indexing='ij'
+    )
+    # Compute distance from center
+    radius = torch.sqrt(xx**2 + yy**2)
+    # Vignette mask: 1 at center, (1-strength) at corners
+    mask = 1 - strength * radius / radius.max()
+    mask = mask.clamp(min=0, max=1)
+    mask = mask[None, None, :, :]  # shape (1, 1, h, w)
+    mask = mask.expand(n, c, h, w)
+    # Apply mask
+    return x * mask
+
+
 class RandomShiftsAug(nn.Module):
     def __init__(self, pad):
         super().__init__()
@@ -363,6 +392,13 @@ def augment(x, aug="overlay", eval=False):
         return x
     elif aug == "distortion" and eval == True:
         x = random_frames(x.float(), augmentation="distortion")
+        return x
+    elif aug == "vignette" and eval == False:
+        x = vignette(x)
+        # view_input(x, save=True)
+        return x
+    elif aug == "vignette" and eval == True:
+        x = random_frames(x.float(), augmentation="vignette")
         return x
     elif aug == "mix":
         return random_mix(x)
@@ -548,6 +584,8 @@ def test_augmentation(augmentation, path, simple_function=False):
             augmented_img = random_cutout(img_tensor, mix=True)
         elif augmentation=="random_distortion":
             augmented_img = random_distortion(img_tensor)
+        elif augmentation=="vignette":
+            augmented_img = vignette(img_tensor)
         else:
             raise NotImplementedError(f"Simple function {augmentation} not implemented.")
     else:
@@ -663,7 +701,8 @@ if __name__ == "__main__":
     # test_augmentation("random_cutout", 'result/svea/miscellaneous/images/input.png', simple_function=True)
     # test_augmentation("random_cutmix", 'result/svea/miscellaneous/images/input.png', simple_function=True)
     # test_augmentation("random_conv", 'result/svea/miscellaneous/images/input.png', simple_function=True)
-    test_augmentation("random_distortion", 'test/test_image.jpg', simple_function=True)
+    # test_augmentation("random_distortion", 'test/test_image.jpg', simple_function=True)
+    test_augmentation("vignette", 'result/svea/miscellaneous/images/input.png', simple_function=True)
     # test_color_change(['result/svea/images/original observation.png', 'result/svea/images/original observation.png', 'result/svea/images/original observation.png'])
     # agent = load_model()
     # view_input(load_obs())

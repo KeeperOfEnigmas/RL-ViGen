@@ -74,7 +74,7 @@ if __name__ == "__main__":
     algorithm = ("svea", "pieg", )
     task_list = ("walker_walk", "pendulum_swingup", )
     seed_list = (1, 2, )
-    evaluation_type = ("color_easy", "color_hard", "video_easy", "video_hard", "distortion", "cutmix", "cutout", "overlay", "cropping", "window", "rotation", "flip_h", "flip_v", "convolution", )
+    evaluation_type = ("color_easy", "color_hard", "video_easy", "video_hard", "vignette", "distortion", "cutmix", "cutout", "overlay", "cropping", "window", "rotation", "flip_h", "flip_v", "convolution", )
     # augmentation = ("cutmix", "cutout", "overlay", "cropping", "window", "rotation", "flip_v", "flip_h", "convolution", )
     augmentation = ("cutmix", "cutout", "no_aug", "overlay", "cropping", "window", "rotation", "flip_v", "flip_h", "convolution", "mix")
 
