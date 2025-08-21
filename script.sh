@@ -1,5 +1,6 @@
 easy_task_list=('pendulum_swingup' 'cheetah_run' 'humanoid_walk')
 seed_list=(1 2 3 4 5)
+# seed_list=(2 3 4 5)
 algorithm=("svea" "pieg")
 # eval_type=("video" "color")
 # eval_difficulty=("hard" "easy")
@@ -35,11 +36,11 @@ for algo in ${algorithm[@]}; do
                                                     # eval_difficulty=${difficulty} \
                     #                             agent.sgqn_quantile=${sgqn_quantile} \
                     #                             agent.aux_lr=${aux_lr}
-                        # done
                     # done
-                done
+                # done
             done
         done
     done
+done
 
 # python train.py env=dmc task_name='walker_walk' seed=5 action_repeat=2 use_wandb=False use_tb=False num_train_frames=1001000 save_snapshot=True save_video=False feature_dim=50

@@ -8,8 +8,8 @@ seed_list=(1 2 3 4 5)
 augmentation=("cutmix" "cutout" "no_aug" "overlay" "cropping" "window" "rotation" "flip_v" "flip_h" "convolution" "mix")
 # augmentation=("cutmix")
 eval_augmentation=("vignette" "distortion" "cutmix" "cutout" "overlay" "cropping" "window" "rotation" "flip_h" "flip_v" "convolution")
-# eval_type=("original" "color" "video")
-eval_type=("original")
+eval_type=("original" "color" "video")
+# eval_type=("original")
 eval_difficulty=("easy" "hard")
 
 for algo in "${algorithm[@]}"; do
@@ -34,11 +34,12 @@ for algo in "${algorithm[@]}"; do
                                                             model_dir=${model_path} \
                                                             +eval_type=original \
                                                             +eval_difficulty=easy \
+                                                            +aug=${aug} \
                         
                         done
                     else
                         for difficulty in "${eval_difficulty[@]}"; do
-                            model_path="/home/weiyi/RL-ViGen/exp_local/${algo}/${task}/${seed}/${aug}/snapshot.pt"
+                            model_path="/${algo}/${task}/${seed}/${aug}/snapshot.pt"
                             CUDA_VISIBLE_DEVICES=0 python locodmc_eval.py \
                                                             env=${env} \
                                                             task=${task} \
@@ -52,6 +53,7 @@ for algo in "${algorithm[@]}"; do
                                                             model_dir=${model_path} \
                                                             +eval_type=${type} \
                                                             +eval_difficulty=${difficulty} \
+                                                            +aug=${aug} \
                         
                         done
                     fi

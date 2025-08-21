@@ -170,7 +170,7 @@ class Workspace:
             self.__dict__[k] = v
 
 
-@hydra.main(config_path='cfgs', config_name='curl_config')
+@hydra.main(config_path='cfgs', config_name='svea_config')
 def main(cfg):
     from locodmc_eval import Workspace as W
     root_dir = Path.cwd()
