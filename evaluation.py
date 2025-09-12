@@ -22,7 +22,10 @@ def evaluation(algorithm: tuple, task_list: tuple, seed_list: tuple, evaluation_
                 result = {"algorithm": algo, "task": task}
                 # result = {"task": task}
                 for aug in augmentation:
-                    result[aug] = pd.Series(task_rewards[aug], dtype="float64").mean()
+                    if eval_type==aug:
+                        result[aug] = float("nan")
+                    else:
+                        result[aug] = pd.Series(task_rewards[aug], dtype="float64").mean()
                 results.append(result)
 
         dataframe = pd.DataFrame(results)
