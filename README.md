@@ -46,9 +46,9 @@
 - [ ] Context aware augmentation with VLM ([A Comprehensive Survey of Data Augmentation in Visual Reinforcement Learning](https://arxiv.org/pdf/2210.04561v4): Section 3.5.1).
 
 ## Questions to answer
-- How various augmentation strategies impact the performance and generalization of agents in visual environments and why? 
-- Does strong augmentations actually lead to better performance and weak augmentations to worse performance? 
-- What is the breaking point when the effect of strong augmentation leads to better performance starts to lose its effectivness? 
+- How various augmentation strategies impact the performance and generalization of agents in visual environments, and why? 
+- Do strong augmentations actually lead to better performance and weak augmentations to worse performance? 
+- What is the breaking point when the effect of strong augmentation leads to better performance starts to lose its effectiveness? 
 - How do different augmentations during training affect the results of evaluation? 
 - Is context-aware augmentation a plausible technique to improve performance and generalization? How does it improve? 
 
