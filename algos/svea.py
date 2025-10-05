@@ -304,8 +304,10 @@ class SVEAAgent:
         # modifications.view_input(obs)
 
         # augment
-        obs = self.aug(obs.float())
+        obs = self.aug(obs.float()) # Shape: [256, 9, 84, 84]
         original_obs = obs.clone()
+        # print("----------------------------SHAPE----------------------------")
+        # print(original_obs.shape)
         next_obs = self.aug(next_obs.float())
 
         # Original code

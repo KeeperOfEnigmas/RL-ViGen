@@ -317,9 +317,17 @@ def random_frames(x, augmentation:str):
 
 def random_mix(x):
     aug_list = ["overlay", "cropping", "window", "rotation", "flip_v", "flip_h", "convolution", "cutout", "cutmix", "no_aug"]
-    aug = random.choice(aug_list)
+    # aug = random.choice(aug_list)
+    batch_size = x.shape[0]
+    out = []
+    for i in range(batch_size):
+        aug = random.choice(aug_list)
+        # x[i:i+1] keeps the batch dimension for augment
+        out.append(augment(x[i:i+1], aug))
+        # print(f"{i}: {aug}")
 
-    return augment(x, aug)
+    return torch.cat(out, dim=0)
+    # return augment(x, aug)
 
 
 def augment(x, aug="overlay", eval=False):
