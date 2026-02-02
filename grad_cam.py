@@ -18,6 +18,9 @@ from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget, Classif
 import hydra
 from wandb import agent
 import train
+from torchvision.models import resnet18
+import torch.nn as nn
+from torchvision import transforms
 
 
 def get_args():
@@ -96,23 +99,24 @@ def main(cfg):
     agent_state = snapshot['agent']
 
     import wrappers.loco_wrapper as dmc
-    env = dmc.make("walker_walk", frame_stack=cfg.frame_stack, action_repeat=2, seed=5)
+    env = dmc.make("cheetah_run", frame_stack=cfg.frame_stack, action_repeat=2, seed=5)
     agent = train.make_agent(env.observation_spec(), env.action_spec(), cfg.agent)
 
     # Load the state dicts for each component
     agent.encoder.load_state_dict(agent_state.encoder.state_dict())
-    agent.actor.load_state_dict(agent_state.actor.state_dict())
-    agent.critic.load_state_dict(agent_state.critic.state_dict())
-    agent.critic_target.load_state_dict(agent_state.critic_target.state_dict())
+    # agent.actor.load_state_dict(agent_state.actor.state_dict())
+    # agent.critic.load_state_dict(agent_state.critic.state_dict())
+    # agent.critic_target.load_state_dict(agent_state.critic_target.state_dict())
 
     print("agent: " + str(agent))
     
     model = EncoderCAMWrapper(agent.encoder).to(args.device)
-    model.eval()
+    model.eval().requires_grad_(True)
 
-    target_layers = [agent.encoder.model.layer2]
-    print(agent.encoder.model)
-    print(agent.encoder.model.layer2)
+    target_layers = [agent.encoder.model.layer1]
+    print("Encoder: " + str(agent.encoder.model))
+    print("layer2: " + str(agent.encoder.model.layer2))
+    print("Target layer: " + str(target_layers))
 
 
 
@@ -126,10 +130,13 @@ def main(cfg):
     input_tensor = preprocess_image(rgb_img,
                                     mean=[0.485, 0.456, 0.406],
                                     std=[0.229, 0.224, 0.225]).to(args.device)
-    print(input_tensor.shape) # (1, 3, 84, 84)
+    input_tensor.requires_grad_(True)
+    print("Input tensor shape: ", input_tensor.shape) # (1, 3, 84, 84)
     # input_tensor = input_tensor.repeat(1, 3, 1, 1)
-    print(input_tensor.shape) # (1, 9, 84, 84)
-    print(len(input_tensor.shape)) # 4
+    # print("Input shape: ", input_tensor.shape) # (1, 9, 84, 84)
+    print("Input tensor length: ",len(input_tensor.shape)) # 4
+    print("CAM model output shape:", model(input_tensor).shape) # (1, 1024)
+    print("Output type: ", type(model(input_tensor))) # <class 'torch.Tensor'>
 
     # We have to specify the target we want to generate
     # the Class Activation Maps for.
@@ -149,7 +156,7 @@ def main(cfg):
         # AblationCAM and ScoreCAM have batched implementations.
         # You can override the internal batch size for faster computation.
         cam.batch_size = 32
-        grayscale_cam = cam(input_tensor=input_tensor,
+        grayscale_cam = cam(input_tensor=input_tensor, # AttributeError: 'NoneType' object has no attribute 'shape'
                             targets=targets,
                             aug_smooth=args.aug_smooth,
                             eigen_smooth=args.eigen_smooth)
