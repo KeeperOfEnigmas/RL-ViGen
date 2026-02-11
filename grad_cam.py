@@ -1,3 +1,7 @@
+# Install: python -m pip install git+https://github.com/jacobgil/pytorch-grad-cam.git
+# scipy 1.9.3
+# conda install -c conda-forge scikit-learn
+
 import argparse
 import os
 import cv2
@@ -104,9 +108,9 @@ def main(cfg):
 
     # Load the state dicts for each component
     agent.encoder.load_state_dict(agent_state.encoder.state_dict())
-    # agent.actor.load_state_dict(agent_state.actor.state_dict())
-    # agent.critic.load_state_dict(agent_state.critic.state_dict())
-    # agent.critic_target.load_state_dict(agent_state.critic_target.state_dict())
+    agent.actor.load_state_dict(agent_state.actor.state_dict())
+    agent.critic.load_state_dict(agent_state.critic.state_dict())
+    agent.critic_target.load_state_dict(agent_state.critic_target.state_dict())
 
     print("agent: " + str(agent))
     
