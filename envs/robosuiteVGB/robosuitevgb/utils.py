@@ -18,7 +18,7 @@ def omegaconf_to_dict(d: DictConfig) -> Dict:
     return ret
 
 
-def make_env(task_name: str, seed: int, scene_id: int = 0):
+def make_env(task_name: str, seed: int, scene_id: int = 0, mode: str = "train"):
     """
     create the robo envs with different parameters.
     """
@@ -38,6 +38,10 @@ def make_env(task_name: str, seed: int, scene_id: int = 0):
         cfg_dict['task_def']['robots'] = robots
     if "TwoArm" in cfg_dict['task_def']['env_name'] and type(cfg_dict['task_def']['robots']) == str:
         cfg_dict['task_def']['robots'] = [cfg_dict['task_def']['robots']] * 2
+    # Resolution of observations
+    # cfg_dict['task_def']['camera_heights'] = 480
+    # cfg_dict['task_def']['camera_widths'] = 480
+    cfg_dict['mode'] = mode
     env = suite.make(
         **cfg_dict['task_def'],
         use_camera_obs=True,
@@ -106,6 +110,9 @@ def make_env(task_name: str, seed: int, scene_id: int = 0):
                      video_background=cfg_dict['video_background'],
                      image_height=cfg_dict['image_height'],
                      image_width=cfg_dict['image_width'],
+                    #  Resolution of videos
+                    #  image_height=480,
+                    #  image_width=480,
                      except_robot=cfg_dict['except_robot'],
                      )
     return env

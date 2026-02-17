@@ -299,10 +299,13 @@ class Workspace:
         with snapshot.open('wb') as f:
             torch.save(payload, f)
 
-    def load_snapshot(self):
-        snapshot = self.work_dir / 'snapshot.pt'
-        with snapshot.open('rb') as f:
-            payload = torch.load(f)
+    def load_snapshot(self, file_path=None):
+        if file_path is not None:
+            payload = torch.load(file_path)
+        else:
+            snapshot = self.work_dir / 'snapshot.pt'
+            with snapshot.open('rb') as f:
+                payload = torch.load(f)
         for k, v in payload.items():
             self.__dict__[k] = v
 

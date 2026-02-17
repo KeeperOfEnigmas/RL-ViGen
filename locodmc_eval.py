@@ -50,8 +50,16 @@ class Workspace:
         work_dir = f'{cfg.model_dir}/{self.agent_name}/{cfg.seed}'
         self.model_work_dir = work_dir
         # Modification
-        agent = torch.load(f'{cfg.model_dir}', map_location='cuda:0')
-        # agent = torch.load('D:/Git/RL-ViGen/exp_local/svea/pendulum_swingup/1/cutmix/snapshot.pt', map_location='cuda:0')
+        # agent = torch.load(f'{cfg.model_dir}', map_location='cuda:0')
+        # agent = torch.load('D:/Git/RL-ViGen/exp_local/pieg/humanoid_walk/3/flip_v/snapshot.pt', map_location='cuda:0')
+        if "svea" in cfg.agent._target_:
+            algo = "svea"
+        elif "pieg" in cfg.agent._target_:
+            algo = "pieg"
+        model_path = f'D:/Git/RL-ViGen/exp_local/{algo}/pendulum_swingup/{self.cfg.seed}/{self.cfg.aug}/snapshot.pt'
+        # model_path = f'D:/Git/RL-ViGen/exp_local/{algo}/Door/1/{self.cfg.aug}/snapshot.pt'
+        agent = torch.load(model_path, map_location='cuda:0')
+        print(f"Loaded model: {model_path}")
         self.agent = agent['agent']
         self._global_step = agent['_global_step']
 
@@ -66,11 +74,18 @@ class Workspace:
         # create logger
         self.logger = Logger(self.work_dir, use_tb=self.cfg.use_tb, use_wandb=self.cfg.use_wandb)
         # create envs
-        self.train_env = dmc.make(self.cfg.task_name, self.cfg.frame_stack,
-                                  self.cfg.action_repeat, self.cfg.seed, type='video', difficulty='hard')
-        self.eval_env = dmc.make(self.cfg.task_name, self.cfg.frame_stack,
-                                 # Modification
-                                 self.cfg.action_repeat, self.cfg.seed, type=self.cfg.eval_type, difficulty=self.cfg.eval_difficulty)
+        if self.cfg.env == 'dmc':
+            self.train_env = dmc.make(self.cfg.task_name, self.cfg.frame_stack,
+                                        self.cfg.action_repeat, self.cfg.seed)
+            self.eval_env = dmc.make(self.cfg.task_name, self.cfg.frame_stack,
+                                        # Modification
+                                        self.cfg.action_repeat, self.cfg.seed, type=self.cfg.eval_type, difficulty=self.cfg.eval_difficulty)
+        elif self.cfg.env == 'robosuite':
+            from wrappers.robo_wrapper import robo_make
+            self.train_env = robo_make(name=self.cfg.task_name, action_repeat=self.cfg.action_repeat, 
+                                       frame_stack=self.cfg.frame_stack, seed=self.cfg.seed)
+            self.eval_env = robo_make(name=self.cfg.task_name, action_repeat=self.cfg.action_repeat, 
+                                      frame_stack=self.cfg.frame_stack, seed=self.cfg.seed, mode=self.cfg.mode)
         # create replay buffer
         data_specs = (self.train_env.observation_spec(),
                       self.train_env.action_spec(),

@@ -113,9 +113,9 @@ class FrameStackWrapper(dm_env.Environment):
         return getattr(self._env, name)
 
 
-def robo_make(name, frame_stack=3, action_repeat=2, seed=1, scene_id=0):
+def robo_make(name, frame_stack=3, action_repeat=2, seed=1, scene_id=0, mode="train"):
     # create environment instance
-    env = robosuitevgb.make_env(task_name=name, seed=seed, scene_id=scene_id)
+    env = robosuitevgb.make_env(task_name=name, seed=seed, scene_id=scene_id, mode=mode)
     # add wrappers
     env = Gym2DMC(env)
     env = ActionDTypeWrapper(env, np.float32)

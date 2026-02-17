@@ -44,13 +44,14 @@ def get_args():
                             'finercam'
                         ],
                         help='CAM method')
-    parser.add_argument('--output-dir', type=str, default='D:/Git/RL-ViGen/images/saliency_output/',
+    parser.add_argument('--output-dir', type=str, default='D:/Git/RL-ViGen/images/saliency_maps/',
                         help='Output directory to save the images')
-    parser.add_argument('--tasks', type=list, default=["walker_walk","pendulum_swingup", "cheetah_run", "humanoid_walk"],
+    parser.add_argument('--tasks', type=str, nargs='+', default=["walker_walk", "pendulum_swingup", "cheetah_run", "humanoid_walk"],
                         help='Task name')
-    # parser.add_argument('--tasks', type=list, default=["Door", "Lift", "TwoArmLift"], help='Task name')
-    parser.add_argument('--augmentation', type=list, default=["cutmix", "cutout", "no_aug", "overlay", "cropping", "window", "rotation", "flip_v", "flip_h", "convolution", "mix"],
+    # parser.add_argument('--tasks', type=str, nargs='+', default=["Door", "Lift", "TwoArmLift"], help='Task name')
+    parser.add_argument('--augmentation', type=str, nargs='+', default=["cutmix", "cutout", "no_aug", "overlay", "cropping", "window", "rotation", "flip_v", "flip_h", "convolution", "mix"],
                         help='Augmentations')
+    parser.add_argument('--seed', type=str, default=1, help='Seed')
     args = parser.parse_args()
     
     if args.device:
@@ -60,7 +61,7 @@ def get_args():
 
     return args
 
-class EncoderCAMWrapper(torch.nn.Module):
+class EncoderWrapper(torch.nn.Module):
     def __init__(self, encoder):
         super().__init__()
         self.encoder = encoder
@@ -95,39 +96,34 @@ def main(cfg):
     workspace = train.Workspace(cfg)
     if "svea" in cfg.agent._target_:
         algo = "svea"
+        target_layers = [agent.encoder.layers]
     elif "pieg" in cfg.agent._target_:
         algo = "pieg"
+        target_layers = [agent.encoder.model.layer2]
     
     for aug in args.augmentation:
         for task in args.tasks:
             try:
-                workspace.load_snapshot(file_path=f"D:/Git/RL-ViGen/exp_local/{algo}/{task}/2/{aug}/snapshot.pt")
+                workspace.load_snapshot(file_path=f"D:/Git/RL-ViGen/exp_local/{algo}/{task}/{args.seed}/{aug}/snapshot.pt")
             except Exception as e:
                 print(e)
                 continue
-            agent = workspace.agent
 
-            # Load the state dicts for each component
+            agent = workspace.agent
             agent.encoder.load_state_dict(agent.encoder.state_dict())
             # agent.actor.load_state_dict(agent.actor.state_dict())
             # agent.critic.load_state_dict(agent.critic.state_dict())
             # agent.critic_target.load_state_dict(agent.critic_target.state_dict())
-
             # print("agent: " + str(agent))
             
-            model = EncoderCAMWrapper(agent.encoder).to(args.device)
+            model = EncoderWrapper(agent.encoder).to(args.device)
             model.eval().requires_grad_(True)
-
-            if algo=="svea":
-                target_layers = [agent.encoder.layers]
-            elif algo=="pieg":
-                target_layers = [agent.encoder.model.layer2]
             # target_layers = [agent.encoder.layers]
             # print("Encoder: " + str(agent.encoder.model))
             # print("layer2: " + str(agent.encoder.model.layer2))
             # print("Target layer: " + str(target_layers))
 
-            rgb_img = cv2.imread(f"{args.image_path}input_{task}.png", 1)[:, :, ::-1]
+            rgb_img = cv2.imread(f"{args.image_path}{task}_highres.png", 1)[:, :, ::-1]
             rgb_img = np.float32(rgb_img) / 255
             rgb_img = cv2.resize(rgb_img, (84, 84))
             input_tensor = preprocess_image(rgb_img,
