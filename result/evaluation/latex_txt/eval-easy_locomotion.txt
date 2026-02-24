@@ -1,0 +1,14 @@
+Eval-Easy & & & & & & & & \\
+Algorithms & SVEA & & & & PIEG & & & \\
+Tasks Augmentations & walker walk & pendulum swingup & humanoid walk & cheetah run & walker walk & pendulum swingup & humanoid walk & cheetah run \\
+cutmix          &  &  &  &  &  &  &  &  \\
+cutout          &  &  &  &  &  &  &  &  \\
+no\_aug         &  &  &  &  &  &  &  &  \\
+overlay         &  &  &  &  &  &  &  &  \\
+cropping        &  &  &  &  &  &  &  &  \\
+window          &  &  &  &  &  &  &  &  \\
+rotation        &  &  &  &  &  &  &  &  \\
+flip\_v         &  &  &  &  &  &  &  &  \\
+flip\_h         &  &  &  &  &  &  &  &  \\
+convolution     &  &  &  &  &  &  &  &  \\
+mix             &  &  &  &  &  &  &  &  \\

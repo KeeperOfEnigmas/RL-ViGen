@@ -1,0 +1,14 @@
+Cutmix & & & & & & \\
+Algorithms & SVEA & & & PIEG & & \\
+Tasks Augmentations & Door & Lift & TwoArmLift & Door & Lift & TwoArmLift \\
+cutmix          &  &  &  &  &  &  \\
+cutout          &  &  &  & 462 $\pm$ 0 &  &  \\
+no\_aug         &  &  &  & 439 $\pm$ 0 &  &  \\
+overlay         &  &  &  & 480 $\pm$ 0 &  &  \\
+cropping        &  &  &  &  &  &  \\
+window          &  &  &  &  &  &  \\
+rotation        &  &  &  &  &  &  \\
+flip\_v         &  &  &  &  &  &  \\
+flip\_h         &  &  &  &  &  &  \\
+convolution     &  &  &  &  &  &  \\
+mix             &  &  &  &  &  &  \\

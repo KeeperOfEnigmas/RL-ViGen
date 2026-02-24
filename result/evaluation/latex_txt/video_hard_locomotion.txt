@@ -1,0 +1,14 @@
+Video Hard & & & & & & & & \\
+Algorithms & SVEA & & & & PIEG & & & \\
+Tasks Augmentations & walker walk & pendulum swingup & humanoid walk & cheetah run & walker walk & pendulum swingup & humanoid walk & cheetah run \\
+cutmix          & 177 $\pm$ 0 & 8 $\pm$ 3 & 1.80 $\pm$ 0.24 & 79 $\pm$ 19 &  & 10 $\pm$ 2 & 1.44 $\pm$ 0.04 & 70 $\pm$ 10 \\
+cutout          & 50 $\pm$ 0 & 8 $\pm$ 2 & 1.61 $\pm$ 0.10 & 34 $\pm$ 15 &  & 12 $\pm$ 2 & 1.56 $\pm$ 0.32 & 53 $\pm$ 11 \\
+no\_aug         &  & 8 $\pm$ 1 & 1.54 $\pm$ 0.16 & 35 $\pm$ 7 &  & 8 $\pm$ 2 & 1.63 $\pm$ 0.33 & 29 $\pm$ 13 \\
+overlay         & 357 $\pm$ 0 & 60 $\pm$ 12 &  &  &  & 45 $\pm$ 33 & 1.40 $\pm$ 0.18 & 135 $\pm$ 10 \\
+cropping        & 36 $\pm$ 0 & 10 $\pm$ 4 & 1.53 $\pm$ 0.23 &  &  & 8 $\pm$ 3 & 1.48 $\pm$ 0.22 & 30 $\pm$ 9 \\
+window          & 50 $\pm$ 0 & 7 $\pm$ 3 & 1.83 $\pm$ 0.32 &  &  & 7 $\pm$ 4 & 1.44 $\pm$ 0.17 & 37 $\pm$ 5 \\
+rotation        & 32 $\pm$ 0 & 11 $\pm$ 4 & 1.49 $\pm$ 0.12 &  &  & 9 $\pm$ 4 & 1.67 $\pm$ 0.05 & 23 $\pm$ 8 \\
+flip\_v         & 48 $\pm$ 0 & 9 $\pm$ 5 & 1.82 $\pm$ 0.31 &  &  & 10 $\pm$ 5 & 1.50 $\pm$ 0.12 & 29 $\pm$ 10 \\
+flip\_h         & 58 $\pm$ 0 & 7 $\pm$ 3 & 1.47 $\pm$ 0.33 &  &  & 7 $\pm$ 4 & 1.43 $\pm$ 0.32 & 43 $\pm$ 6 \\
+convolution     &  & 14 $\pm$ 5 & 1.79 $\pm$ 0.37 &  &  & 32 $\pm$ 34 & 1.36 $\pm$ 0.20 & 105 $\pm$ 16 \\
+mix             &  & 25 $\pm$ 11 & 1.31 $\pm$ 0.16 &  &  & 20 $\pm$ 11 & 1.49 $\pm$ 0.05 & 98 $\pm$ 35 \\

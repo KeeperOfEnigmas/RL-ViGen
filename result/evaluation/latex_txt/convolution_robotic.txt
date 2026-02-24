@@ -1,0 +1,14 @@
+Convolution & & & & & & \\
+Algorithms & SVEA & & & PIEG & & \\
+Tasks Augmentations & Door & Lift & TwoArmLift & Door & Lift & TwoArmLift \\
+cutmix          &  &  &  & 2 $\pm$ 0 &  &  \\
+cutout          &  &  &  & 1 $\pm$ 0 &  &  \\
+no\_aug         &  &  &  & 1 $\pm$ 0 &  &  \\
+overlay         &  &  &  & 87 $\pm$ 0 &  &  \\
+cropping        &  &  &  &  &  &  \\
+window          &  &  &  &  &  &  \\
+rotation        &  &  &  &  &  &  \\
+flip\_v         &  &  &  &  &  &  \\
+flip\_h         &  &  &  &  &  &  \\
+convolution     &  &  &  &  &  &  \\
+mix             &  &  &  &  &  &  \\

@@ -1,0 +1,15 @@
+algorithm,task,cutmix,cutout,no_aug,overlay,cropping,window,rotation,flip_v,flip_h,convolution,mix
+svea,walker_walk,,900.03,,951.34,861.13,937.58,845.09,919.3,886.85,,
+svea,pendulum_swingup,,96.51,17.05,151.62,339.05,394.39,9.36,124.05,13.66,21.9,12.7
+svea,humanoid_walk,,2.0,2.05,,,,1.77,1.97,1.75,1.41,1.46
+svea,cheetah_run,,497.81,476.48,,419.74,431.1,387.06,458.09,388.81,363.53,372.53
+svea,Door,,,,,,,,,,,
+svea,Lift,,,,,,,,,,,
+svea,TwoArmLift,,,,,,,,,,,
+pieg,walker_walk,,,,,,,,,,,
+pieg,pendulum_swingup,,75.2,6.22,144.54,265.4,147.34,1.25,16.45,9.76,20.44,15.47
+pieg,humanoid_walk,,1.72,2.01,1.66,1.77,1.7,1.9,1.97,2.0,1.72,1.94
+pieg,cheetah_run,,341.16,167.34,356.29,201.41,134.38,261.91,177.73,240.67,257.26,278.82
+pieg,Door,,462.41,439.44,479.86,,,,,,,
+pieg,Lift,,,,,,,,,,,
+pieg,TwoArmLift,,,,,,,,,,,
