@@ -4,7 +4,7 @@ defaults:
   - override hydra/launcher: submitit_local
 
 # task settings
-env: None
+env: dmc
 frame_stack: 3
 action_repeat: 2
 discount: 0.99
@@ -26,7 +26,7 @@ device: cuda:0
 save_video: false
 save_train_video: false
 use_tb: true
-use_wandb: true
+use_wandb: false
 # experiment
 experiment: exp
 # agent
@@ -37,8 +37,9 @@ wandb_group: None
 model_dir: none
 # Modification
 # eval_mode
-eval_type: color
+eval_type: original
 eval_difficulty: easy
+mode: eval-easy
 
 agent:
   _target_: algos.svea.SVEAAgent
