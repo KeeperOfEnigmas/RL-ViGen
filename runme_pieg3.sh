@@ -8,8 +8,8 @@ feature_dim=50
 sgqn_quantile=0.93
 action_repeat=2
 aux_lr=8e-5
-# env=dmc
-env=robosuite
+env=dmc
+# env=robosuite
 
 for algo in ${algorithm[@]}; do
     for task_name in ${easy_task_list[@]}; do
