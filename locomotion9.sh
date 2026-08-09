@@ -1,8 +1,8 @@
 # export MUJOCO_GL=glfw
-easy_task_list=('cheetah_run')
-seed_list=(2 5)
-algorithm=("pieg")
-augmentation=("cutmix" "cutout" "no_aug" "overlay" "cropping" "window" "rotation" "flip_v" "flip_h" "convolution" "mix") 
+easy_task_list=('walker_walk')
+seed_list=(1)
+algorithm=("svea")
+augmentation=("overlay" "convolution" "mix") 
 frames=1001000
 feature_dim=50
 sgqn_quantile=0.93

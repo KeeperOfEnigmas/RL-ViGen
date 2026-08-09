@@ -1,7 +1,7 @@
 # export MUJOCO_GL=glfw
-easy_task_list=('walker_walk')
-seed_list=(2 3 4 5 1)
-algorithm=("svea")
+easy_task_list=('humanoid_walk')
+seed_list=(5)
+algorithm=("pieg")
 augmentation=("cutmix" "cutout" "no_aug" "overlay" "cropping" "window" "rotation" "flip_v" "flip_h" "convolution" "mix") 
 frames=1001000
 feature_dim=50
