@@ -1,16 +1,16 @@
-\begin{tabular}{lcccccc}
-Flip V & & & & & & \\
-Algorithms & SVEA & & & PIEG & & \\
-Tasks Augmentations & Door & Lift & TwoArmLift & Door & Lift & TwoArmLift \\
-cutmix          &  &  &  & 11 $\pm$ 0 &  &  \\
-cutout          &  &  &  & 1 $\pm$ 0 &  &  \\
-no\_aug         &  &  &  & 1 $\pm$ 0 &  &  \\
-overlay         &  &  &  & 1 $\pm$ 0 &  &  \\
-cropping        &  &  &  &  &  &  \\
-window          &  &  &  &  &  &  \\
-rotation        &  &  &  &  &  &  \\
-flip\_v         &  &  &  &  &  &  \\
-flip\_h         &  &  &  &  &  &  \\
-convolution     &  &  &  &  &  &  \\
-mix             &  &  &  &  &  &  \\
+\begin{tabular}{lcc}
+Flip V & & \\
+Algorithms & PIEG & \\
+Tasks Augmentations & Door & Lift \\
+cutmix          & \textbf{4.10 $\pm$ 4.77} & \textbf{8.14 $\pm$ 11} \\
+cutout          & 2.08 $\pm$ 1.96 & 4.28 $\pm$ 4.62 \\
+no\_aug         & 0.75 $\pm$ 0.07 & 0.26 $\pm$ 0.27 \\
+overlay         & 0.69 $\pm$ 0.01 & 0.36 $\pm$ 0.43 \\
+cropping        & 0.85 $\pm$ 0.20 & 0.81 $\pm$ 1.06 \\
+window          & 0.83 $\pm$ 0.21 & 0.71 $\pm$ 0.95 \\
+rotation        & 0.99 $\pm$ 0.44 & 2.43 $\pm$ 1.91 \\
+flip\_v         &  &  \\
+flip\_h         & 1.88 $\pm$ 1.28 & 2.12 $\pm$ 2.88 \\
+convolution     & 3.30 $\pm$ 2.57 & 0.24 $\pm$ 0.16 \\
+mix             & 2.38 $\pm$ 1.25 & 1.18 $\pm$ 1.27 \\
 \end{tabular}

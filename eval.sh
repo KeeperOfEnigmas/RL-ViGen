@@ -1,63 +1,61 @@
-#!/bin/bash
-export MUJOCO_GL=glfw
-# env=dmc
-env=robosuite
-# task_list=(Door)
-task_list=(TwoArmLift)
-algorithm=(pieg)
+# !/bin/bash
+# export MUJOCO_GL=glfw
+env=dmc
+# env=robosuite
+task_list=("cheetah_run")
+# task_list=("humanoid_walk")
+# task_list=("Door")
+algorithm=(svea)
 # seed_list=(1 2 3 4 5)
-# seed_list=(5)
-seed_list=(1)
+# seed_list=(2)
+seed_list=(4)
 # augmentation=("cutmix" "cutout" "no_aug" "overlay" "cropping" "window" "rotation" "flip_v" "flip_h" "convolution" "mix")
-# augmentation=("cutmix" "cutout" "no_aug" "cropping" "window")
-# augmentation=("rotation" "flip_v" "flip_h" "convolution" "mix")
-augmentation=("no_aug")
-eval_augmentation=("no_aug")
-# eval_augmentation=("vignette" "distortion" "cutmix" "cutout" "overlay" "cropping" "window" "rotation" "flip_h" "flip_v" "convolution")
+augmentation=("mix")
+# augmentation=("overlay")
+# eval_augmentation=("vignette")
+eval_augmentation=("vignette" "distortion" "cutmix" "cutout" "overlay" "cropping" "window" "rotation" "flip_h" "flip_v" "convolution")
 # eval_type=("original" "video" "color")
-# eval_type=("video" "color")
 eval_type=("original")
-# eval_difficulty=("easy" "hard")
-eval_difficulty=("easy")
-mode=("eval-easy" "eval-medium" "eval-hard")
-mode=("train")
+# eval_type=("original" "mode")
+eval_difficulty=("easy" "hard")
+# mode=("eval-easy" "eval-medium" "eval-hard")
+# mode=("train")
+action_repeat=2
+# action_repeat=1 # 1 for robotic, 2 otherwise
 
 for algo in "${algorithm[@]}"; do
     for task in "${task_list[@]}"; do
         for seed in "${seed_list[@]}"; do
             for aug in "${augmentation[@]}"; do
                 for type in "${eval_type[@]}"; do
-                    if [ "$env" == "dmc" ]; then
-                        if  [ "$type" == "original" ]; then
-                            for eval_aug in "${eval_augmentation[@]}"; do
-                                # model_path="/home/weiyi/RL-ViGen/exp_local/${algo}/${task}/${seed}/${aug}/snapshot.pt"
-                                CUDA_VISIBLE_DEVICES=0 python locodmc_eval.py \
-                                                                env=${env} \
-                                                                task=${task} \
-                                                                seed=${seed} \
-                                                                action_repeat=2 \
-                                                                use_tb=False \
-                                                                save_snapshot=False \
-                                                                +eval_aug=${eval_aug} \
-                                                                +aug=${aug} \
-                                                                wandb_group=walker_walk \
-                                                                +mode=eval-hard \
-                                                                # save_video=True \
-                                                                # use_wandb=False \
-                                                                # +eval_type=original \
-                                                                # +eval_difficulty=easy \
-                                                                # model_dir=${model_path} \
-                                                                # +aug=${aug} \
-                            
-                            done
-                        else
+                    if  [ "$type" == "original" ]; then
+                        for eval_aug in "${eval_augmentation[@]}"; do
+                            # model_path="/home/weiyi/RL-ViGen/exp_local/${algo}/${task}/${seed}/${aug}/snapshot.pt"
+                            CUDA_VISIBLE_DEVICES=0 python locodmc_eval.py \
+                                                            env=${env} \
+                                                            task=${task} \
+                                                            seed=${seed} \
+                                                            action_repeat=${action_repeat} \
+                                                            use_tb=False \
+                                                            save_snapshot=False \
+                                                            +eval_aug=${eval_aug} \
+                                                            +aug=${aug} \
+                                                            wandb_group=walker_walk \
+                                                            # save_video=True \
+                                                            # use_wandb=False \
+                                                            # +eval_type=original \
+                                                            # +eval_difficulty=easy \
+                                                            # model_dir=${model_path} \
+                        done
+                    else
+                        if [ "$env" == "dmc" ]; then
                             for difficulty in "${eval_difficulty[@]}"; do
                                 # model_path="/home/weiyi/RL-ViGen/exp_local/${algo}/${task}/${seed}/${aug}/snapshot.pt"
                                 CUDA_VISIBLE_DEVICES=0 python locodmc_eval.py \
                                                                 env=${env} \
                                                                 task=${task} \
                                                                 seed=${seed} \
-                                                                action_repeat=2 \
+                                                                action_repeat=${action_repeat} \
                                                                 use_tb=False \
                                                                 save_snapshot=False \
                                                                 wandb_group=walker_walk \
@@ -70,26 +68,24 @@ for algo in "${algorithm[@]}"; do
                                                                 # +eval_type=${type} \
                                                                 # +eval_difficulty=${difficulty} \
                                                                 # model_dir=${model_path} \
-                                                                # +aug=${aug} \
-                            
                             done
-                        fi
-                    else
-                        for m in "${mode[@]}"; do
+                        else
+                            for m in "${mode[@]}"; do
                                 # model_path="/home/weiyi/RL-ViGen/exp_local/${algo}/${task}/${seed}/${aug}/snapshot.pt"
                                 CUDA_VISIBLE_DEVICES=0 python locodmc_eval.py \
                                                                 env=${env} \
                                                                 task=${task} \
                                                                 seed=${seed} \
-                                                                action_repeat=2 \
+                                                                action_repeat=${action_repeat} \
                                                                 use_tb=False \
                                                                 save_snapshot=False \
                                                                 wandb_group=walker_walk \
                                                                 +eval_aug=no_aug \
                                                                 +aug=${aug} \
-                                                                +mode=${m} \
+                                                                mode=${m} \
 
                             done
+                        fi
                     fi
                 done
             done
@@ -97,4 +93,3 @@ for algo in "${algorithm[@]}"; do
     done
 done
 
-# redo pieg/pendulum_swingup/1, 2, 3, all evaluation augmentations

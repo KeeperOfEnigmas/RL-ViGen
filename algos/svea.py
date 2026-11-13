@@ -11,6 +11,7 @@ import torch.nn.functional as F
 import utils
 from utils import random_overlay
 import modifications
+from torch.amp import autocast
 
 class RandomShiftsAug(nn.Module):
     def __init__(self, pad):

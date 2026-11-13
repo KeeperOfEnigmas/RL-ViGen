@@ -1,15 +1,3 @@
 algorithm,task,cutmix,cutout,no_aug,overlay,cropping,window,rotation,flip_v,flip_h,convolution,mix
-svea,walker_walk,,,,,,,,,,,
-svea,pendulum_swingup,,,,,,,,,,,
-svea,humanoid_walk,,,,,,,,,,,
-svea,cheetah_run,,,,,,,,,,,
-svea,Door,,,,,,,,,,,
-svea,Lift,,,,,,,,,,,
-svea,TwoArmLift,,,,,,,,,,,
-pieg,walker_walk,,,,,,,,,,,
-pieg,pendulum_swingup,,,,,,,,,,,
-pieg,humanoid_walk,,,,,,,,,,,
-pieg,cheetah_run,,,,,,,,,,,
-pieg,Door,2.33,3.06,1.04,313.08,,,,,,,
-pieg,Lift,,,,,,,,,,,
-pieg,TwoArmLift,,,,,,,,,,,
+pieg,Door,3.36,3.08,0.98,245.05,1.04,0.98,3.22,1.11,5.83,120.01,272.41
+pieg,Lift,0.78,0.54,1.05,1.13,0.25,0.78,1.0,0.04,0.99,3.79,0.89

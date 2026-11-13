@@ -3,6 +3,8 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 import warnings
+
+import torchvision
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 import os
@@ -15,6 +17,7 @@ except:
 from pathlib import Path
 
 import hydra
+from hydra.core.hydra_config import HydraConfig
 import numpy as np
 import torch
 from dm_env import specs
@@ -228,8 +231,13 @@ class Workspace:
 
         # Modification
         # View input
-        # obs = time_step.observation
+        # input = time_step.observation
         # modifications.view_input(obs, save=True)
+        # input = input[0:3, :, :]
+        # input = torch.as_tensor(input, device=self.device)
+        # path1 = f"D:/Git/RL-ViGen/images/TwoArmPegInHole_highres.png"
+        # torchvision.utils.save_image(input/255, path1) 
+        # exit()   
 
         self.replay_storage.add(time_step)
         self.train_video_recorder.init(time_step.observation)
@@ -280,7 +288,6 @@ class Workspace:
 
             # try to update the agent
             if not seed_until_step(self.global_step):
-                # Modification
                 metrics = self.agent.update(self.replay_iter, self.global_step, augmentation=self.cfg.aug)
                 self.logger.log_metrics(metrics, self.global_frame, ty='train')
 
@@ -291,6 +298,9 @@ class Workspace:
             self.train_video_recorder.record(time_step.observation)
             episode_step += 1
             self._global_step += 1
+
+        if self.cfg.save_snapshot:
+            self.save_snapshot()
 
     def save_snapshot(self):
         snapshot = self.work_dir / 'snapshot.pt'
@@ -310,7 +320,7 @@ class Workspace:
             self.__dict__[k] = v
 
 
-@hydra.main(config_path='cfgs', config_name='svea_config')
+@hydra.main(config_path='cfgs', config_name='pieg_config')
 def main(cfg):
     from train import Workspace as W
     root_dir = Path.cwd()

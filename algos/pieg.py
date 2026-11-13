@@ -12,6 +12,7 @@ from torchvision import transforms
 import utils
 from utils import random_overlay
 import modifications
+from torch.amp import autocast
 
 
 
@@ -88,6 +89,7 @@ class ResEncoder(nn.Module):
         self.repr_dim = 1024
         self.image_channel = 3
         x = torch.randn([32] + [9, 84, 84])
+        # saliency maps
         with torch.no_grad():
             out_shape = self.forward_conv(x).shape
         self.out_dim = out_shape[1]
@@ -98,6 +100,7 @@ class ResEncoder(nn.Module):
         # nn.init.orthogonal_(self.fc.weight.data)
         # self.fc.bias.data.fill_(0.0)
 
+    # saliency maps
     @torch.no_grad()
     def forward_conv(self, obs, flatten=True):
         obs = obs / 255.0 - 0.5

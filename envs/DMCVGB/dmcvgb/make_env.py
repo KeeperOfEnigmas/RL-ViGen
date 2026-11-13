@@ -87,8 +87,8 @@ def make_env(domain_name, task_name, seed, action_repeat=2, frame_stack=3, type=
         # Resolution of observations
         height=cfg_dict['image_size'], 
         width=cfg_dict['image_size'],
-        # height=480, 
-        # width=480,
+        # height=120, 
+        # width=120,
         episode_length=cfg_dict['episode_length'],
         frame_skip=cfg_dict['action_repeat'],
         is_distracting_cs=cfg_dict['is_distracting_cs'],

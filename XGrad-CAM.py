@@ -1,4 +1,5 @@
 import argparse
+import os
 import cv2
 import numpy as np
 import torch
@@ -201,12 +202,12 @@ def get_args():
                         help='class of interest')
     parser.add_argument('--output-dir', type=str, default='D:/Git/RL-ViGen/images/saliency_maps/',
                         help='Output directory to save the images')
-    parser.add_argument('--tasks', type=str, nargs='+', default=["walker_walk", "pendulum_swingup", "cheetah_run", "humanoid_walk"],
-                        help='Task name')
-    # parser.add_argument('--tasks', type=str, nargs='+', default=["Door", "Lift", "TwoArmLift"], help='Task name')
-    parser.add_argument('--augmentation', type=str, nargs='+', default=["cutmix", "cutout", "no_aug", "overlay", "cropping", "window", "rotation", "flip_v", "flip_h", "convolution", "mix"],
+    # parser.add_argument('--tasks', type=str, nargs='+', default=["walker_walk"], help='Task name')
+    # parser.add_argument('--tasks', type=str, nargs='+', default=["walker_walk", "pendulum_swingup", "cheetah_run", "humanoid_walk"], help='Task name')
+    parser.add_argument('--tasks', type=str, nargs='+', default=["Door"], help='Task name')
+    parser.add_argument('--augmentation', type=str, nargs='+', default=["cropping"],
                         help='Augmentations')
-    parser.add_argument('--seed', type=str, default=1, help='Seed')
+    parser.add_argument('--seeds', type=str, nargs='+', default=[3], help='Seed')
     args = parser.parse_args()
     args.use_cuda = args.use_cuda and torch.cuda.is_available()
     if args.use_cuda:
@@ -227,9 +228,18 @@ class EncoderWrapper(torch.nn.Module):
         # replicate frames INSIDE the model
         x = x.repeat(1, 3, 1, 1)  # → (B,9,H,W)
         return self.encoder(x)
+    
+
+def stack_input(img1, img2, img3):
+    input1 = preprocess_image(img1)
+    input2 = preprocess_image(img2)
+    input3 = preprocess_image(img3)
+    input = torch.cat([input1, input2, input3], dim=1)
+
+    return input
 
 
-@hydra.main(config_path='cfgs', config_name='svea_config')
+@hydra.main(config_path='cfgs', config_name='pieg_config')
 def main(cfg):
     args = get_args()
 
@@ -243,31 +253,50 @@ def main(cfg):
     
     for aug in args.augmentation:
         for task in args.tasks:
-            try:
-                workspace.load_snapshot(file_path=f"D:/Git/RL-ViGen/exp_local/{algo}/{task}/{args.seed}/{aug}/snapshot.pt")
-            except Exception as e:
-                print(e)
-                continue
+            for seed in args.seeds:
+                file_path=f"D:/Git/RL-ViGen/exp_local/{algo}/{task}/{seed}/{aug}/snapshot.pt"
+                try:
+                    workspace.load_snapshot(file_path)
+                except Exception as e:
+                    print(e)
+                    continue
 
-            agent = workspace.agent
-            agent.encoder.load_state_dict(agent.encoder.state_dict())
+                print(f"Loading snapshot from: {file_path}")
 
-            grad_cam = GradCam(model=agent.encoder, \
-                            target_layer_names=target_layer_names, use_cuda=True, algo=algo)
+                agent = workspace.agent
+                agent.encoder.load_state_dict(agent.encoder.state_dict())
 
-            img = cv2.imread(f"{args.image_path}{task}_highres.png", 1)
-            img_highres = img.copy()
-            img = np.float32(cv2.resize(img, (84, 84))) / 255
-            input = preprocess_image(img)
+                grad_cam = GradCam(model=agent.encoder, \
+                                target_layer_names=target_layer_names, use_cuda=True, algo=algo)
 
-            # If -1, returns the map for the highest scoring category.
-            # Otherwise, targets the requested index.
-            target_index = args.target_index
-            [cam, X_cam] = grad_cam(input, target_index)
+                img = cv2.imread(f"{args.image_path}{task}_highres.png", 1)
+                img_highres = img.copy()
+                img = np.float32(cv2.resize(img, (84, 84))) / 255
+                input = preprocess_image(img)
 
-            img_highres = np.float32(img_highres) / 255
-            show_cam_on_image(img_highres, cam, f'{args.output_dir}cam_{algo}_{task}_{aug}')
-            show_cam_on_image(img_highres, X_cam, f'{args.output_dir}X_cam_{algo}_{task}_{aug}')
+                # img1 = cv2.imread(f"D:/Git/RL-ViGen/images/{algo}/test_{task}_0.png", 1)
+                # img_highres = img1.copy()
+                # img1 = np.float32(cv2.resize(img1, (84, 84))) / 255
+                # img2 = cv2.imread(f"D:/Git/RL-ViGen/images/{algo}/test_{task}_3.png", 1)
+                # img2 = np.float32(cv2.resize(img2, (84, 84))) / 255
+                # img3 = cv2.imread(f"D:/Git/RL-ViGen/images/{algo}/test_{task}_6.png", 1)
+                # img3 = np.float32(cv2.resize(img3, (84, 84))) / 255
+                # input = stack_input(img1, img2, img3)
+
+                # If -1, returns the map for the highest scoring category.
+                # Otherwise, targets the requested index.
+                target_index = args.target_index
+                [cam, X_cam] = grad_cam(input, target_index)
+
+                img_highres = np.float32(img_highres) / 255
+                # os.makedirs(f"{args.output_dir}{seed}/", exist_ok=True)
+                os.makedirs(f"{args.output_dir}{algo}/{task}/", exist_ok=True)
+                # show_cam_on_image(img_highres, cam, f'{args.output_dir}{seed}/cam_{algo}_{task}_{aug}')
+                # show_cam_on_image(img_highres, X_cam, f'{args.output_dir}{seed}/X_cam_{algo}_{task}_{aug}')
+                show_cam_on_image(img_highres, cam, f'{args.output_dir}{algo}/{task}/cam_{algo}_{task}_{aug}_{seed}')
+                show_cam_on_image(img_highres, X_cam, f'{args.output_dir}{algo}/{task}/X_cam_{algo}_{task}_{aug}_{seed}')
+                # show_cam_on_image(img_highres, cam, f'D:/Git/RL-ViGen/images/{algo}/test_cam_{algo}_{task}_{aug}')
+                # show_cam_on_image(img_highres, X_cam, f'D:/Git/RL-ViGen/images/{algo}/test_X_cam_{algo}_{task}_{aug}')
 
 
 if __name__ == '__main__':

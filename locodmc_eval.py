@@ -7,13 +7,14 @@ warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 import os
 os.environ['MKL_SERVICE_FORCE_INTEL'] = '1'
-os.environ['MUJOCO_GL'] = 'egl'
+# os.environ['MUJOCO_GL'] = 'egl'
 
 from pathlib import Path
 
 import hydra
 import numpy as np
 import torch
+from torchvision.utils import save_image
 from dm_env import specs
 
 import wrappers.loco_wrapper as dmc
@@ -56,8 +57,8 @@ class Workspace:
             algo = "svea"
         elif "pieg" in cfg.agent._target_:
             algo = "pieg"
-        model_path = f'D:/Git/RL-ViGen/exp_local/{algo}/pendulum_swingup/{self.cfg.seed}/{self.cfg.aug}/snapshot.pt'
-        # model_path = f'D:/Git/RL-ViGen/exp_local/{algo}/Door/1/{self.cfg.aug}/snapshot.pt'
+        # model_path = f'D:/Git/RL-ViGen/exp_local/{algo}/cheetah_run/{self.cfg.seed}/{self.cfg.aug}/snapshot.pt'
+        model_path = f'D:/Git/RL-ViGen/exp_local/{algo}/Lift/{self.cfg.seed}/{self.cfg.aug}/snapshot.pt'
         agent = torch.load(model_path, map_location='cuda:0')
         print(f"Loaded model: {model_path}")
         self.agent = agent['agent']
@@ -147,6 +148,25 @@ class Workspace:
                                                     self.global_step,
                                                     eval_mode=True)
                         else:
+                            # exit()
+                            # input = time_step.observation
+                            # c, h, w = input.shape
+                            # for i in range(0, c, 3):
+                            #     img = input[i:i+3, :, :]
+                            #     img = torch.as_tensor(img, device=self.device)
+                            #     path = f"D:/Git/RL-ViGen/images/test_pendulum_swingup_{i}.png"
+                            #     save_image(img/255, path)
+                            # input = input[0:3, :, :]
+                            # input = torch.as_tensor(input, device=self.device)
+                            # path1 = f"D:/Git/RL-ViGen/images/TwoArmPegInHole_highres.png"
+                            # save_image(input/255, path1) 
+                            # exit()   
+                            # auged = time_step.observation
+                            # auged = auged[0:3, :, :]
+                            # auged = torch.as_tensor(auged, device=self.device)
+                            # path2 = "D:/Git/RL-ViGen/images/video_easy.png"
+                            # if not os.path.exists(path2):
+                            #     save_image(auged/255, path2)
                             action = self.agent.act(time_step.observation,
                                                     self.global_step,
                                                     eval_mode=True)
@@ -185,7 +205,7 @@ class Workspace:
             self.__dict__[k] = v
 
 
-@hydra.main(config_path='cfgs', config_name='svea_config')
+@hydra.main(config_path='cfgs', config_name='pieg_config')
 def main(cfg):
     from locodmc_eval import Workspace as W
     root_dir = Path.cwd()

@@ -1,14 +1,14 @@
-Overlay & & & & & & \\
-Algorithms & SVEA & & & PIEG & & \\
-Tasks Augmentations & Door & Lift & TwoArmLift & Door & Lift & TwoArmLift \\
-cutmix          &  &  &  & 3 $\pm$ 0 &  &  \\
-cutout          &  &  &  & 15 $\pm$ 0 &  &  \\
-no\_aug         &  &  &  & 1 $\pm$ 0 &  &  \\
-overlay         &  &  &  &  &  &  \\
-cropping        &  &  &  &  &  &  \\
-window          &  &  &  &  &  &  \\
-rotation        &  &  &  &  &  &  \\
-flip\_v         &  &  &  &  &  &  \\
-flip\_h         &  &  &  &  &  &  \\
-convolution     &  &  &  &  &  &  \\
-mix             &  &  &  &  &  &  \\
+Overlay & & \\
+Algorithms & PIEG & \\
+Tasks Augmentations & Door & Lift \\
+cutmix          & 1.56 $\pm$ 1.08 & 1.96 $\pm$ 2.69 \\
+cutout          & 6.11 $\pm$ 6.18 & \textbf{3.73 $\pm$ 1.33} \\
+no\_aug         & 0.95 $\pm$ 0.20 & 0.42 $\pm$ 0.52 \\
+overlay         &  &  \\
+cropping        & 0.72 $\pm$ 0.05 & 0.13 $\pm$ 0.05 \\
+window          & 1.00 $\pm$ 0.38 & 0.06 $\pm$ 0.02 \\
+rotation        & 0.88 $\pm$ 0.15 & 2.57 $\pm$ 1.83 \\
+flip\_v         & 0.71 $\pm$ 0.01 & 0.37 $\pm$ 0.39 \\
+flip\_h         & 2.63 $\pm$ 2.32 & 0.29 $\pm$ 0.19 \\
+convolution     & 1.49 $\pm$ 0.28 & 2.06 $\pm$ 2.65 \\
+mix             & \textbf{15 $\pm$ 20} & 1.61 $\pm$ 2.10 \\

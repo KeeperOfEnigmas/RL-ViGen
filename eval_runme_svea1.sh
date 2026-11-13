@@ -22,7 +22,7 @@ for algo in "${algorithm[@]}"; do
                                                             env=${env} \
                                                             task=${task} \
                                                             seed=${seed} \
-                                                            action_repeat=2 \
+                                                            action_repeat=1 \
                                                             use_tb=False \
                                                             save_snapshot=False \
                                                             +eval_aug=${eval_aug} \
@@ -61,7 +61,7 @@ for algo in "${algorithm[@]}"; do
                                                                 env=${env} \
                                                                 task=${task} \
                                                                 seed=${seed} \
-                                                                action_repeat=2 \
+                                                                action_repeat=1 \
                                                                 use_tb=False \
                                                                 save_snapshot=False \
                                                                 wandb_group=walker_walk \

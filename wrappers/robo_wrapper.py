@@ -44,6 +44,17 @@ class Gym2DMC(Environment):
                         discount=discount,
                         observation=obs)
 
+    # robotic evaluation video
+    def render(self):
+        env = self._gym_env
+        sim = getattr(env, 'sim', None)
+        if sim is None:
+            env = getattr(env, 'env', None)
+            sim = getattr(env, 'sim', None)
+        if sim is None:
+            raise AttributeError('The robosuite environment does not expose a simulator for rendering.')
+        return sim.render(height=256, width=256, camera_name='agentview')
+
     def reset(self):
         obs = self._gym_env.reset()
         obs = obs['rgb']

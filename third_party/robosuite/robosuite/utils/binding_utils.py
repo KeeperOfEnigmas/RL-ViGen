@@ -34,9 +34,16 @@ if CUDA_VISIBLE_DEVICES != "":
             MUJOCO_EGL_DEVICE_ID in CUDA_VISIBLE_DEVICES
         ), "MUJOCO_EGL_DEVICE_ID needs to be set to one of the device id specified in CUDA_VISIBLE_DEVICES"
 
-if macros.MUJOCO_GPU_RENDERING and os.environ.get("MUJOCO_GL", None) not in ["osmesa", "glx"]:
+# if macros.MUJOCO_GPU_RENDERING and os.environ.get("MUJOCO_GL", None) not in ["osmesa", "glx"]:
     # If gpu rendering is specified in macros, then we enforce gpu
     # option for rendering
+# If GPU rendering is enabled in robosuite build macros, only choose a
+# GPU backend when the user has not explicitly set `MUJOCO_GL`.
+# Previously this branch would unconditionally set 'egl' (on non-macOS),
+# overriding user choices like 'glfw'. Preserve any explicit setting.
+if macros.MUJOCO_GPU_RENDERING and not os.environ.get("MUJOCO_GL"):
+    # If gpu rendering is specified in macros, then suggest a GPU
+    # option for rendering only when MUJOCO_GL is not set by the user.
     if _SYSTEM == "Darwin":
         os.environ["MUJOCO_GL"] = "cgl"
     else:

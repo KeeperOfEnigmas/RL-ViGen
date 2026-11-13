@@ -1,14 +1,14 @@
-Eval-Easy & & & & & & \\
-Algorithms & SVEA & & & PIEG & & \\
-Tasks Augmentations & Door & Lift & TwoArmLift & Door & Lift & TwoArmLift \\
-cutmix          &  &  &  & 6 $\pm$ 0 &  &  \\
-cutout          &  &  &  & 1 $\pm$ 0 &  &  \\
-no\_aug         &  &  &  & 2 $\pm$ 0 &  &  \\
-overlay         &  &  &  & 175 $\pm$ 0 &  &  \\
-cropping        &  &  &  &  &  &  \\
-window          &  &  &  &  &  &  \\
-rotation        &  &  &  &  &  &  \\
-flip\_v         &  &  &  &  &  &  \\
-flip\_h         &  &  &  &  &  &  \\
-convolution     &  &  &  &  &  &  \\
-mix             &  &  &  &  &  &  \\
+Eval-Easy & & \\
+Algorithms & PIEG & \\
+Tasks Augmentations & Door & Lift \\
+cutmix          & 4.88 $\pm$ 2.26 & 0.99 $\pm$ 1.09 \\
+cutout          & 4.61 $\pm$ 4.40 & \textbf{9.96 $\pm$ 10} \\
+no\_aug         & 1.24 $\pm$ 0.35 & 7.41 $\pm$ 10 \\
+overlay         & 138 $\pm$ 85 & 0.44 $\pm$ 0.43 \\
+cropping        & 1.85 $\pm$ 0.43 & 0.11 $\pm$ 0.09 \\
+window          & 1.49 $\pm$ 0.43 & 0.90 $\pm$ 1.22 \\
+rotation        & 0.77 $\pm$ 0.05 & 1.65 $\pm$ 1.92 \\
+flip\_v         & 1.09 $\pm$ 0.27 & 6.56 $\pm$ 8.91 \\
+flip\_h         & 11 $\pm$ 7.78 & 2.83 $\pm$ 3.92 \\
+convolution     & \textbf{338 $\pm$ 48} & 0.96 $\pm$ 1.05 \\
+mix             & 186 $\pm$ 119 & 1.81 $\pm$ 2.35 \\

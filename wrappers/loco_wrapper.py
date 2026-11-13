@@ -28,7 +28,10 @@ class Gym2DMC(Environment):
         self._gym_env = gym_env
 
     def render(self):
-        self._gym_env.render()
+        # locomotion evaluation video
+        # self._gym_env.render()
+        # robotic evaluation video
+        return self._gym_env.render()
 
     def step(self, action):
         obs, reward, done, info = self._gym_env.step(action)

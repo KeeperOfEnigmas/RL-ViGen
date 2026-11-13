@@ -316,7 +316,7 @@ def random_frames(x, augmentation:str):
 
 
 def random_mix(x):
-    aug_list = ["overlay", "cropping", "window", "rotation", "flip_v", "flip_h", "convolution", "cutout", "cutmix", "no_aug"]
+    aug_list = ["overlay", "cropping", "window", "rotation", "flip_v", "flip_h", "convolution", "cutout", "cutmix"]
     # aug = random.choice(aug_list)
     batch_size = x.shape[0]
     out = []
@@ -421,8 +421,10 @@ def view_input(obs, save=False, sample_idx=128):
     if isinstance(obs, torch.Tensor):
         obs = obs.detach().cpu().numpy()
     # If batch dimension exists, select the sample
-    if obs.ndim == 4:
+    if obs.ndim == 4 and obs.shape[0] > 1:
         obs = obs[sample_idx]  # shape (9, H, W)
+    if obs.shape[0] == 1:
+        obs = obs.squeeze(0)
     if isinstance(obs, np.ndarray):
         for i in range(0, obs.shape[0], 3):
             img = obs[i:i+3].transpose(1, 2, 0)
@@ -482,33 +484,31 @@ def saliency_map(self, obs: torch.tensor, step, save_dir=None, base_filename="sv
     # Ensure obs is batched
     if obs.ndim == 3:
         obs = obs.unsqueeze(0)  # (1, C, H, W)
-    obs = obs.clone().requires_grad_(True)
+
+    obs = obs.clone().detach().requires_grad_(True)
 
     # Forward pass
-    # output = self.encoder(obs)
-    # score, class_idx = output.max(dim=1)
-    # score = score.sum()  # sum over batch if needed
     features = self.encoder(obs)
-    stddev = utils.schedule(self.stddev_schedule, step) 
+
+    stddev = utils.schedule(self.stddev_schedule, step)
     dist = self.actor(features, stddev)
-    action = dist.mean
+    action = dist.mean.detach()  # IMPORTANT: stop actor gradients
+
     q1, q2 = self.critic(features, action)
-    score = torch.min(q1, q2)[0, 0]  # scalar
+    score = torch.min(q1, q2).mean()  # scalar
 
     # Backward pass
+    self.encoder.zero_grad()
+    self.critic.zero_grad()
     score.backward()
 
-    # Get saliency: max over channels, abs value
-    # saliency = obs.grad.abs()
-    # saliency = saliency[0][:3].max(dim=0)[0].cpu().numpy()
-    # img = obs[0][:3].cpu().detach().numpy().transpose(1, 2, 0) / 255.0
-    saliency = obs.grad.data.abs().squeeze()[:3,:,:].max(dim=0)[0]
-    saliency = saliency.cpu().data.numpy()
-    img = obs.cpu().data.numpy().squeeze().transpose(1, 2, 0)[:,:,:3]/255.0
+    # Compute saliency
+    saliency = obs.grad.detach().abs()
 
-    saliency = saliency / (saliency.max() + 1e-8) # Normalize saliency map
-    threshold = 0.2  # Set a threshold for visualization
-    saliency = np.where(saliency >= threshold, saliency, 0)
+    # Take max over RGB channels of first frame
+    saliency = saliency[0, :3].max(dim=0)[0]
+
+    saliency = saliency / (saliency.max() + 1e-8)
 
     # Plot
     fig = plt.figure(figsize=(8, 4))
@@ -550,6 +550,7 @@ def save_unique_image(fig, directory, base_filename):
 # Testing section
 from PIL import Image
 import torchvision.transforms as T
+from torchvision.utils import save_image
 import matplotlib.pyplot as plt
 import os
 import train
@@ -627,19 +628,20 @@ def test_augmentation(augmentation, path, simple_function=False):
     # plt.show()
 
 
-def img_to_tensor(path, size):
+def img_to_tensor(path, size=None):
     # Load image
     img = Image.open(path).convert('RGB')
 
     # Resize to square (e.g., 84x84)
-    img = img.resize(size)
+    if size is not None:
+        img = img.resize(size)
 
     # Convert to tensor and add batch dimension
     transform = T.ToTensor()  # Converts to [0,1] float tensor, shape (c, h, w)
     img_tensor = transform(img).unsqueeze(0)  # Shape: (1, 3, 84, 84)
 
     # If your model expects [0,255] range, scale accordingly
-    img_tensor = img_tensor * 255.0
+    img_tensor = img_tensor.to(dtype=torch.float32, device="cuda") * 255.0
 
     return img_tensor
 
@@ -662,9 +664,10 @@ def stack_images(paths, size=(84, 84)):
     return stacked
 
 
-@hydra.main(config_path='cfgs', config_name='svea_config')
+@hydra.main(config_path='cfgs', config_name='pieg_config')
 def load_model(cfg):
-    snapshot = torch.load('D:/Git/RL-ViGen/exp_local/2025.06.03/svea/base_slight_color/snapshot.pt', map_location='cpu')
+    snapshot = torch.load("D:/Git/RL-ViGen/exp_local/pieg/cheetah_run/1/overlay/snapshot.pt")
+    print("snapshot: " + str(snapshot))
     agent_state = snapshot['agent']
     step = snapshot['_global_step']
 
@@ -681,6 +684,7 @@ def load_model(cfg):
     obs = load_obs()
     saliency_map(agent, torch.as_tensor(obs, device=agent.device).float(), step, save_dir="D:/Git/RL-ViGen/result/svea/saliency_map")
 
+    print("agent: " + str(agent))
     return agent
 
 
@@ -710,7 +714,17 @@ if __name__ == "__main__":
     # test_augmentation("random_cutmix", 'result/svea/miscellaneous/images/input.png', simple_function=True)
     # test_augmentation("random_conv", 'result/svea/miscellaneous/images/input.png', simple_function=True)
     # test_augmentation("random_distortion", 'test/test_image.jpg', simple_function=True)
-    test_augmentation("vignette", 'result/svea/miscellaneous/images/input.png', simple_function=True)
+    # test_augmentation("vignette", 'result/svea/miscellaneous/images/input.png', simple_function=True)
     # test_color_change(['result/svea/images/original observation.png', 'result/svea/images/original observation.png', 'result/svea/images/original observation.png'])
     # agent = load_model()
     # view_input(load_obs())
+
+    # evaluation_type = ("vignette", "distortion", "cutmix", "cutout", "overlay", "cropping", "window", "rotation", "flip_h", "flip_v", "convolution")
+    evaluation_type = ("cutmix", "cutout")
+    # input = img_to_tensor("result\svea\miscellaneous\images\paper\input.png")
+
+    for eval_type in evaluation_type:
+        input = img_to_tensor("images/paper_original/input.png")
+        x = augment(input, aug=eval_type)
+        save_image(x/255, f"images/paper_original/{eval_type}.png")
+    # agent = load_model()

@@ -46,10 +46,13 @@ class VideoRecorder:
                                            width=self.render_size,
                                            camera_id=0)
             else:
-                if video:
-                    frame = env._env._env._env._gym_env.env.env.render()
-                else:
-                    frame = env.render()
+                # locomotion evaluation video
+                # if video:
+                #     frame = env._env._env._env._gym_env.env.env.render()
+                # else:
+                #     frame = env.render()
+                # robotic evaluation video
+                frame = env.render()
             self.frames.append(frame)
 
     def save(self, file_name):
